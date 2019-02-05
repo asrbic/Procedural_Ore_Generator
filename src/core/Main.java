@@ -41,15 +41,15 @@ public class Main {
 				countTiles(mapData);
 			}
 			mapData.clearOreData();
-			long tilesGenerated = generator.generatePatches(mapData, config.getOres(), config.getGlobalPatchSizeMultiplier(), config.getGlobalPatchSizeVariance(), config.getMaxOreTiles(), config.getMaxOrePatches(), config.getSeed());
+			long tilesGenerated = generator.generatePatches(mapData, config.getOres(), config.getGlobalPatchSizeMultiplier(), config.getGlobalPatchSizeVariance(), config.getMaxOreTiles(), config.getMaxOrePatches(), config.getSeed(), config.getSurfaceHintColour());
 			System.out.println("Tiles generated:" + tilesGenerated);
 			mapHandler.writeMapData(mapData, config.getPlanetDataOutputPath(), config.isLoadSurfaceHintMaps());
 		}
 	}
 	
 	public void generateTestConfig() {
-		Ore[] ores = {new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false),
-					  new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false)};
+		Ore[] ores = {new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0),
+					  new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0)};
 		configs = new ArrayList<Config>();
 		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7, true));
 		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7, true));		

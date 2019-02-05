@@ -8,6 +8,7 @@
     "planetDataPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\Alien",
     "planetDataOutputPath": "./planet_data_out_alien",
     "loadSurfaceHintMaps": true,
+    "surfaceHintColour": 144,
     "countCurrent": true,
     "ores": [
       {
@@ -17,7 +18,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 0
       },
       {
       	"id": 12,
@@ -26,7 +28,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 0
       },
       {
       	"id": 14,
@@ -35,7 +38,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 0
       },
       {
       	"id": 16,
@@ -44,7 +48,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 0
       },
       {
       	"id": 18,
@@ -53,7 +58,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 0
       },
       {
       	"id": 20,
@@ -62,7 +68,8 @@
         "density": 1.0,
         "shape": 1,
         "surfaceHint": 1.0,
-        "spawnOnIce": false
+        "spawnOnIce": false,
+        "centreOreTile": 40
       }
     ]
   }

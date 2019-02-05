@@ -1,16 +1,17 @@
 package config;
 
 public class Ore {
-	public final int id;
-	public final double occurenceProbility;
-	public final int surfaceArea;
-	public final float density;
-	public final int shape;
+	public int id;
+	public double occurenceProbility;
+	public int surfaceArea;
+	public float density;
+	public int shape;
 	public float surfaceHint;
-	public final boolean spawnOnIce;
+	public boolean spawnOnIce;
+	public int centreOreTile;
 	//possibly set shaded surface patch visibility per ore? Could do a scalar (probability of showing patch). 
 	//Would probs be useful to have an override in Config
-	public Ore(int id, double occurenceProbability, int surfaceArea, float density, int shape, float surfaceHint, boolean spawnOnIce) {
+	public Ore(int id, double occurenceProbability, int surfaceArea, float density, int shape, float surfaceHint, boolean spawnOnIce, int centreOreTile) {
 		this.id = id;
 		this.occurenceProbility = occurenceProbability;
 		this.surfaceArea = surfaceArea;
@@ -18,6 +19,7 @@ public class Ore {
 		this.shape = shape;
 		this.surfaceHint = surfaceHint;
 		this.spawnOnIce = spawnOnIce;
+		this.centreOreTile = centreOreTile;
 	}
 
 }

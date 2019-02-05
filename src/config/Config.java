@@ -23,6 +23,9 @@ public class Config {
 	String planetDataPath;
 	String planetDataOutputPath;
 	boolean loadSurfaceHintMaps;
+	int surfaceHintColour;
+
+
 	boolean countCurrent;
 	Ore[] ores;
 	
@@ -77,6 +80,7 @@ public class Config {
 	}
 	
 	public void cascadeOverrides() {
+		surfaceHintColour = 0xFF000000 & (surfaceHintColour << 4);
 		if(!loadSurfaceHintMaps) {
 			for(Ore ore : ores) {
 				ore.surfaceHint = 0.0f;
@@ -164,4 +168,11 @@ public class Config {
 		this.loadSurfaceHintMaps = loadSurfaceHintMaps;
 	}
 
+	public int getSurfaceHintColour() {
+		return surfaceHintColour;
+	}
+
+	public void setSurfaceHintColour(int surfaceHintColour) {
+		this.surfaceHintColour = surfaceHintColour;
+	}
 }
