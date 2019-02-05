@@ -1,0 +1,69 @@
+[
+  {
+    "globalPatchSizeMultiplier": 1.0,
+    "globalPatchSizeVariance": 0.4,
+    "maxOreTiles": 35000,
+    "maxOrePatches": 1000,
+    "seed": 7,
+    "planetDataPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\Alien",
+    "planetDataOutputPath": "./planet_data_out_alien",
+    "loadSurfaceHintMaps": true,
+    "countCurrent": true,
+    "ores": [
+      {
+      	"id": 10,
+        "occurenceProbility": 0.2,
+        "surfaceArea": 40,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      },
+      {
+      	"id": 12,
+        "occurenceProbility": 0.3,
+        "surfaceArea": 50,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      },
+      {
+      	"id": 14,
+        "occurenceProbility": 0.4,
+        "surfaceArea": 60,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      },
+      {
+      	"id": 16,
+        "occurenceProbility": 1,
+        "surfaceArea": 70,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      },
+      {
+      	"id": 18,
+        "occurenceProbility": 0.3,
+        "surfaceArea": 100,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      },
+      {
+      	"id": 20,
+        "occurenceProbility": 0.4,
+        "surfaceArea": 200,
+        "density": 1.0,
+        "shape": 1,
+        "surfaceHint": 1.0,
+        "spawnOnIce": false
+      }
+    ]
+  }
+]
