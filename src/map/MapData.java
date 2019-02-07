@@ -49,7 +49,7 @@ public class MapData {
 			}
 			BufferedImage hintImg = surfaceHintImages[i];
 			if(hintImg != null) {
-				Graphics2D    graphics = img.createGraphics();
+				Graphics2D graphics = hintImg.createGraphics();
 				graphics.setPaint ( new Color(BACKGROUND_ADD_COLOUR));
 				graphics.fillRect (0, 0, hintImg.getWidth(), hintImg.getHeight());
 			}
