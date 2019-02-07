@@ -24,9 +24,7 @@ public class Config {
 	String planetDataOutputPath;
 	boolean loadSurfaceHintMaps;
 	int surfaceHintColour;
-
-
-	boolean countCurrent;
+	boolean makeColouredMaps;
 	Ore[] ores;
 	
 	public static Config loadConfig(String path) {
@@ -58,7 +56,7 @@ public class Config {
 	}
 
 	public Config(String planetDataPath, String planetDataOutputPath, float globalPatchSizeMultiplier, float globalPatchSizeVariance, Ore[] ores, int maxOreTiles,
-			int maxOrePatches, long seed, boolean countCurrent) {
+			int maxOrePatches, long seed) {
 		this.planetDataPath = planetDataPath;
 		this.planetDataOutputPath = planetDataOutputPath;
 		this.globalPatchSizeMultiplier = globalPatchSizeMultiplier;
@@ -67,7 +65,6 @@ public class Config {
 		this.maxOreTiles = maxOreTiles;
 		this.maxOrePatches = maxOrePatches;
 		this.seed = seed;
-		this.countCurrent = countCurrent;
 	}
 	
 	public Config() {
@@ -80,7 +77,7 @@ public class Config {
 	}
 	
 	public void cascadeOverrides() {
-		surfaceHintColour = 0xFF000000 & (surfaceHintColour << 4);
+		surfaceHintColour = 0xFF000000 | (surfaceHintColour << 16);
 		if(!loadSurfaceHintMaps) {
 			for(Ore ore : ores) {
 				ore.surfaceHint = 0.0f;
@@ -151,14 +148,6 @@ public class Config {
 	public void setOres(Ore[] ores) {
 		this.ores = ores;
 	}
-	
-	public boolean isCountCurrent() {
-		return countCurrent;
-	}
-
-	public void setCountCurrent(boolean countCurrent) {
-		this.countCurrent = countCurrent;
-	}
 
 	public boolean isLoadSurfaceHintMaps() {
 		return loadSurfaceHintMaps;
@@ -175,4 +164,13 @@ public class Config {
 	public void setSurfaceHintColour(int surfaceHintColour) {
 		this.surfaceHintColour = surfaceHintColour;
 	}
+
+	public boolean isMakeColouredMaps() {
+		return makeColouredMaps;
+	}
+
+	public void setMakeColouredMaps(boolean makeColouredMaps) {
+		this.makeColouredMaps = makeColouredMaps;
+	}
+
 }

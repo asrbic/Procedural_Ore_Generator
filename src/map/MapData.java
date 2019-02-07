@@ -13,7 +13,7 @@ public class MapData {
 	public static final int DOWN = 4;
 	public static final int BACK = 5;
 	
-	public static final int MAP_SIDES = 1;//6;
+	public static final int MAP_SIDES = 6;
 	public static final int[][] adjacency = 
 		{{},
 			{},
@@ -24,7 +24,8 @@ public class MapData {
 	
 	public BufferedImage[] images;
 	public BufferedImage[] surfaceHintImages;
-
+	public BufferedImage[] colouredMaps;
+	
 	public static final int BACKGROUND_ORE_COLOUR = 255;
 	public static final int BACKGROUND_ADD_COLOUR = 0xFF000000;
 
@@ -33,28 +34,33 @@ public class MapData {
 	public MapData() {
 		images = new BufferedImage[MAP_SIDES];
 		surfaceHintImages = new BufferedImage[MAP_SIDES];
+		colouredMaps = new BufferedImage[MAP_SIDES];
 	}
 	
 	public void clearOreData() {
-		for(int i = 0; i < images.length; ++i) {
+		for(int i = 0; i < MAP_SIDES; ++i) {
 			BufferedImage img = images[i];
-			if(img == null) {
-				continue;
-			}
-			for(int j = 0; j < img.getWidth(); ++j) {
-				for(int k = 0; k < img.getHeight(); ++k) {
-					img.setRGB(j, k, img.getRGB(j, k) | BACKGROUND_ORE_COLOUR);
+			if(img != null) {
+				for(int j = 0; j < img.getWidth(); ++j) {
+					for(int k = 0; k < img.getHeight(); ++k) {
+						img.setRGB(j, k, img.getRGB(j, k) | BACKGROUND_ORE_COLOUR);
+					}
 				}
 			}
-		}
-		for(int i = 0; i < surfaceHintImages.length; ++i) {
-			BufferedImage img = surfaceHintImages[i];
-			if(img == null) {
-				continue;
+			BufferedImage hintImg = surfaceHintImages[i];
+			if(hintImg != null) {
+				Graphics2D    graphics = img.createGraphics();
+				graphics.setPaint ( new Color(BACKGROUND_ADD_COLOUR));
+				graphics.fillRect (0, 0, hintImg.getWidth(), hintImg.getHeight());
 			}
-			Graphics2D    graphics = img.createGraphics();
-			graphics.setPaint ( new Color(BACKGROUND_ADD_COLOUR));
-			graphics.fillRect (0, 0, img.getWidth(), img.getHeight());
+			BufferedImage colouredImg = colouredMaps[i];
+			if(colouredImg != null) {
+				for(int j = 0; j < colouredImg.getWidth(); ++j) {
+					for(int k = 0; k < colouredImg.getHeight(); ++k) {
+						colouredImg.setRGB(j, k, colouredImg.getRGB(j, k) | BACKGROUND_ORE_COLOUR);
+					}
+				}
+			}
 		}
 	}
 	

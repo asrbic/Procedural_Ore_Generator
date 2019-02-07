@@ -28,31 +28,41 @@ public class Main {
 	
 	Main() {
 //		generateTestConfig();
-		configs = Config.loadConfigs("config.json");
+		String configFile = "config.json";
+		System.out.println("Attempting to load " + configFile);
+		configs = Config.loadConfigs(configFile);
 		mapHandler = new MapHandler();
 		mapData = new MapData();
 		generator = new Generator();
 	}
 	
 	public void run() {
+		System.out.println("Starting ore generation");
 		for(Config config : configs) {
-			mapData = mapHandler.loadMapData(config.getPlanetDataPath(), config.isLoadSurfaceHintMaps());
-			if(config.isCountCurrent()) {
-				countTiles(mapData);
-			}
+			System.out.println("Loading map data from: " + config.getPlanetDataPath());
+			mapData = mapHandler.loadMapData(config.getPlanetDataPath(), config.isLoadSurfaceHintMaps(), config.isMakeColouredMaps());
+			countTiles(mapData);
+			config.cascadeOverrides();
+			System.out.println("Clearing existing ore data");
 			mapData.clearOreData();
-			long tilesGenerated = generator.generatePatches(mapData, config.getOres(), config.getGlobalPatchSizeMultiplier(), config.getGlobalPatchSizeVariance(), config.getMaxOreTiles(), config.getMaxOrePatches(), config.getSeed(), config.getSurfaceHintColour());
+			System.out.println("Generating ore tiles...");
+			long tilesGenerated = generator.generatePatches(mapData, config.getOres(), config.getGlobalPatchSizeMultiplier(), 
+					config.getGlobalPatchSizeVariance(), config.getMaxOreTiles(), config.getMaxOrePatches(), 
+					config.getSeed(), config.getSurfaceHintColour(), config.isMakeColouredMaps());
 			System.out.println("Tiles generated:" + tilesGenerated);
-			mapHandler.writeMapData(mapData, config.getPlanetDataOutputPath(), config.isLoadSurfaceHintMaps());
+			System.out.println("Writing ore data to map images in: " + config.getPlanetDataOutputPath());
+			mapHandler.writeMapData(mapData, config.getPlanetDataOutputPath(), config.isLoadSurfaceHintMaps(), config.isMakeColouredMaps());
+			System.out.println("Map images saved");
 		}
+		System.out.println("Done.");
 	}
 	
 	public void generateTestConfig() {
-		Ore[] ores = {new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0),
-					  new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0)};
+		Ore[] ores = {new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0, "0xFFFFFF"),
+					  new Ore(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0, "0xFFF000")};
 		configs = new ArrayList<Config>();
-		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7, true));
-		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7, true));		
+		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7));
+		configs.add(new Config("./", "./", 1.0f, 0.4f, ores, 10000, 1000, 7));		
 		
 	}
 	

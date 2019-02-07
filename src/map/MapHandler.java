@@ -14,6 +14,7 @@ public class MapHandler {
 
 public static final String MAT = "_mat.png";
 public static final String ADD = "_add.png";
+public static final String COLOURED = "_coloured.png";
 public static final String FRONT_MAP_NAME = "front";
 public static final String LEFT_MAP_NAME = "left";
 public static final String RIGHT_MAP_NAME = "right";
@@ -24,14 +25,17 @@ public static final String BACK_MAP_NAME = "back";
 
 public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_MAP_NAME, UP_MAP_NAME, DOWN_MAP_NAME, BACK_MAP_NAME};
 
-	public MapData loadMapData(String path, boolean loadSurfaceHintMaps) {
+	public MapData loadMapData(String path, boolean loadSurfaceHintMaps, boolean makeColouredMaps) {
 		MapData mapData = new MapData();
-		for(int i = 0; i < 1/*MAP_NAMES.length*/; ++i) {
+		for(int i = 0; i < MAP_NAMES.length; ++i) {
 			String mapName = MAP_NAMES[i];
 			try {
 				mapData.images[i] = ImageIO.read(Paths.get(path, mapName + MAT).toFile());
 				if(loadSurfaceHintMaps) {
 					mapData.surfaceHintImages[i] = ImageIO.read(Paths.get(path, mapName + ADD).toFile());
+				}
+				if(makeColouredMaps) {
+					mapData.colouredMaps[i] = ImageIO.read(Paths.get(path, mapName + MAT).toFile());
 				}
 			}
 			catch(Exception e) {
@@ -45,7 +49,7 @@ public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_M
 		return mapData;
 	}
 	
-	public void writeMapData(MapData mapData, String outputPath, boolean loadSurfaceHintMaps) {
+	public void writeMapData(MapData mapData, String outputPath, boolean loadSurfaceHintMaps, boolean makeColouredMaps) {
 		try {
 			
 			for(int i = 0; i < mapData.images.length; ++i) {
@@ -59,7 +63,11 @@ public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_M
 				}
 				ImageIO.write(mapData.images[i], "png" , Paths.get(outputPath, mapName + MAT).toFile());
 				if(loadSurfaceHintMaps) {
+					
 					ImageIO.write(mapData.surfaceHintImages[i], "png" , Paths.get(outputPath, mapName + ADD).toFile());
+				}
+				if(makeColouredMaps) {
+					ImageIO.write(mapData.colouredMaps[i], "png" , Paths.get(outputPath, mapName + COLOURED).toFile());
 				}
 			}
 		}
