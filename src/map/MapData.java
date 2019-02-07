@@ -32,7 +32,8 @@ public class MapData {
 	public static final int ORE_FILTER = 0x000000FF;
 	public static final int ICE_FILTER = 0x00520000; //82 (colour in R channel for ice in hex)
 	public static final int OPAQUE = 0xFF000000;
-	
+	public static final int UNSET_ORE_FILTER = 0x000000FF;
+
 	int mapSize;
 	
 	public MapData() {
@@ -61,7 +62,23 @@ public class MapData {
 			if(colouredImg != null) {
 				for(int j = 0; j < colouredImg.getWidth(); ++j) {
 					for(int k = 0; k < colouredImg.getHeight(); ++k) {
-						colouredImg.setRGB(j, k, colouredImg.getRGB(j, k) & ORE_EXCLUDER);
+						int pixRGB = colouredImg.getRGB(j, k) & ORE_EXCLUDER;
+						
+						int rgb[] = new int[] {
+						        (pixRGB >> 16) & 0xff, //red
+						        (pixRGB >>  8) & 0xff, //green
+						        (pixRGB      ) & 0xff  //blue
+						};
+						int avg = (( rgb[0] + rgb[1] + rgb[2]) / 3);
+					    int grey_rgb = 0;
+					    grey_rgb |= avg;
+					    for(int l = 0; l < 3; l++) {
+					    	grey_rgb <<= 8;
+					    	grey_rgb |= avg;
+					    	
+					    }
+					    grey_rgb |= OPAQUE;
+					    colouredImg.setRGB(j, k, grey_rgb);
 					}
 				}
 			}
@@ -84,5 +101,27 @@ public class MapData {
 				mapSize = this.images[0].getWidth();
 			}
 		}
+	}
+	
+	public void countTiles() {
+		System.out.println("\tCounting existing ore tiles...");
+		long total = 0;
+		int mapCount = 1;
+		for(BufferedImage img : images) {
+			if(img != null) {
+				long tileCount = 0;
+				for(int i = 0; i < img.getWidth(); ++i) {
+					for(int j = 0; j < img.getHeight(); ++j) {
+						if((img.getRGB(i, j) & UNSET_ORE_FILTER) != UNSET_ORE_FILTER) {
+							++tileCount;
+						}
+					}
+				}
+				System.out.println("\t\tMap " + mapCount++ + " existing tile count:" + tileCount);
+				total += tileCount;
+			}
+		}
+		System.out.println("\tTotal existing tiles: " + total);
+		
 	}
 }

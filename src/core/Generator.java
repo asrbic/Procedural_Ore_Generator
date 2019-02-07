@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import config.Ore;
+import config.OreConfig;
+import config.PlanetConfig;
 import map.MapData;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -21,31 +22,31 @@ import static map.MapData.ORE_FILTER;
 
 public class Generator {
 	
-	public long generatePatches(MapData mapData, Ore[] ores, float globalPatchSizeMultiplier, float globalPatchSizeVariance, int maxOreTiles, int maxOrePatches, long seed, int surfaceHintColour, boolean useTestColours) {
-		List<Pair<Ore, Double>> tempPairedList = new ArrayList<Pair<Ore, Double>>();
-		Map<Ore, Long> oreTileCounts = new HashMap<Ore, Long>();
-		for(Ore ore : ores) {
-			tempPairedList.add(new Pair<Ore, Double>(ore, ore.occurenceProbility));
+	public long generatePatches(MapData mapData, PlanetConfig planetConfig) {
+		List<Pair<OreConfig, Double>> tempPairedList = new ArrayList<Pair<OreConfig, Double>>();
+		Map<OreConfig, Long> oreTileCounts = new HashMap<OreConfig, Long>();
+		for(OreConfig ore : planetConfig.ores) {
+			tempPairedList.add(new Pair<OreConfig, Double>(ore, ore.occurenceProbility));
 			oreTileCounts.put(ore, new Long(0));
 		}
-		EnumeratedDistribution<Ore> oreDist = new EnumeratedDistribution<Ore>(tempPairedList);
-		Random rand = new Random(seed);
+		EnumeratedDistribution<OreConfig> oreDist = new EnumeratedDistribution<OreConfig>(tempPairedList);
+		Random rand = new Random(planetConfig.seed);
 		oreDist.reseedRandomGenerator(rand.nextLong());
 		long generatedTiles = 0;
-		for(int i = 0; i < maxOrePatches && generatedTiles < maxOreTiles; ++i) {
-			Ore ore = oreDist.sample();
-			int generatedTilesForOre = generateOrePatch(mapData, ore, rand, globalPatchSizeMultiplier, globalPatchSizeVariance, surfaceHintColour, useTestColours);
+		for(int i = 0; i < planetConfig.maxOrePatches && generatedTiles < planetConfig.maxOreTiles; ++i) {
+			OreConfig ore = oreDist.sample();
+			int generatedTilesForOre = generateOrePatch(mapData, ore, rand);
 			generatedTiles += generatedTilesForOre;
 			oreTileCounts.put(ore, oreTileCounts.get(ore).longValue() + generatedTilesForOre);
 		}
 
-		for(Ore ore : oreTileCounts.keySet()) {
-			System.out.println("Tiles generated for ore " + ore.id + " with testColour " + ore.testColour + " is:" + oreTileCounts.get(ore));
+		for(OreConfig ore : oreTileCounts.keySet()) {
+			System.out.println("\t\tTiles generated for ore " + ore.type + " (id:" + ore.id + ") with testColour " + Integer.toHexString(ore.testColour) + " : " + oreTileCounts.get(ore));
 		}
 		return generatedTiles;
 	}
 	
-	private int generateOrePatch(MapData mapData, Ore ore, Random rand, float globalPatchSizeMultiplier, float globalPatchSizeVariance, int surfaceHintColour, boolean useTestColours) {
+	private int generateOrePatch(MapData mapData, OreConfig ore, Random rand) {
 		int tilesAdded = 0;
 		int mapSize = mapData.getMapSize();
 		int mapIndex = rand.nextInt(MapData.MAP_SIDES);
@@ -53,7 +54,7 @@ public class Generator {
 		int startRowIndex = rand.nextInt(mapSize);
 		Random tileRand = new Random(rand.nextLong());
 		Random hintRand = new Random(rand.nextLong());
-		int patchSize = Math.round((ore.surfaceArea * globalPatchSizeMultiplier) * (1 + (tileRand.nextFloat() * 2 - 1) * globalPatchSizeVariance));
+		int patchSize = Math.round((ore.surfaceArea * ore.patchSizeMultiplier) * (1 + (tileRand.nextFloat() * 2 - 1) * ore.patchSizeVariance));
 		float patchRadius = Math.round(Math.sqrt((double)patchSize) / (ore.density * 3));
 		float squash = tileRand.nextFloat() * 1.0f + 0.75f;
 		float horizontalSquash;
@@ -67,11 +68,10 @@ public class Generator {
 			horizontalSquash = 1 / squash;			
 		}
 		
-		int oreId = ore.centreOreTile == 0 ? ore.id : ore.centreOreTile;
+		int oreId = ore.centreOreTile == -1 ? ore.id : ore.centreOreTile;
 		
-		boolean avoidIce = !ore.spawnOnIce;
-		float surfaceHint = ore.surfaceHint;
-		boolean isSurfaceHint = ore.surfaceHint > 0;
+		boolean avoidIce = ore.avoidIce;
+		boolean isSurfaceHint = ore.surfaceHintMaps && ore.surfaceHintProbability > 0;
 		int colIndex = startColIndex;
 		int rowIndex = startRowIndex;
 		int centreOreTile = ore.centreOreTile;
@@ -83,10 +83,6 @@ public class Generator {
 		int iterations = 0;
 		int maxIterations = patchSize * 20;
 		
-		int testColour = 0;
-		if(useTestColours) {//get around lack of unsigned ints 
-			testColour = Integer.parseInt(ore.testColour, 16) | OPAQUE;
-		}
 		do {
 			//add patch tiles
 			//each tile/pixel corresponds to a 30x30m patch of ore in game - measured on EarthLike
@@ -105,14 +101,14 @@ public class Generator {
 				}
 				img.setRGB(colIndex, rowIndex, (img.getRGB(colIndex, rowIndex) & ORE_EXCLUDER) | oreId);
 				++tilesAdded;
-				if(useTestColours) {
-					colouredImg.setRGB(colIndex, rowIndex, testColour);
+				if(ore.makeColouredMaps) {
+					colouredImg.setRGB(colIndex, rowIndex, ore.testColour);
 				}
-				if(isSurfaceHint && hintRand.nextFloat() < surfaceHint) {
-					hintImg.setRGB(colIndex, rowIndex, surfaceHintColour);
+				if(isSurfaceHint && hintRand.nextFloat() < ore.surfaceHintProbability) {
+					hintImg.setRGB(colIndex, rowIndex, ore.surfaceHintColour);
 				}
 			}
-			if(centreOreTile != 0 && iterations == 0) {
+			if(centreOreTile != -1 && iterations == 0) {
 				oreId = ore.id;
 			}
 			colIndex = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
