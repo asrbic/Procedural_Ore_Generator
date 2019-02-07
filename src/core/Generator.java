@@ -14,12 +14,12 @@ import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
 
+import static map.MapData.OPAQUE;
+import static map.MapData.ICE_FILTER;
+import static map.MapData.ORE_EXCLUDER;
+import static map.MapData.ORE_FILTER;
+
 public class Generator {
-	
-	public static final int ORE_EXCLUDER = 0xFFFFFF00;
-	public static final int ORE_FILTER = 0x000000FF;
-	public static final int ICE_FILTER = 0x00520000; //82 (colour in R channel for ice in hex)
-	public static final int OPAQUE = 0xFF000000;
 	
 	public long generatePatches(MapData mapData, Ore[] ores, float globalPatchSizeMultiplier, float globalPatchSizeVariance, int maxOreTiles, int maxOrePatches, long seed, int surfaceHintColour, boolean useTestColours) {
 		List<Pair<Ore, Double>> tempPairedList = new ArrayList<Pair<Ore, Double>>();

@@ -28,7 +28,11 @@ public class MapData {
 	
 	public static final int BACKGROUND_ORE_COLOUR = 255;
 	public static final int BACKGROUND_ADD_COLOUR = 0xFF000000;
-
+	public static final int ORE_EXCLUDER = 0xFFFFFF00;
+	public static final int ORE_FILTER = 0x000000FF;
+	public static final int ICE_FILTER = 0x00520000; //82 (colour in R channel for ice in hex)
+	public static final int OPAQUE = 0xFF000000;
+	
 	int mapSize;
 	
 	public MapData() {
@@ -57,7 +61,7 @@ public class MapData {
 			if(colouredImg != null) {
 				for(int j = 0; j < colouredImg.getWidth(); ++j) {
 					for(int k = 0; k < colouredImg.getHeight(); ++k) {
-						colouredImg.setRGB(j, k, colouredImg.getRGB(j, k) | BACKGROUND_ORE_COLOUR);
+						colouredImg.setRGB(j, k, colouredImg.getRGB(j, k) & ORE_EXCLUDER);
 					}
 				}
 			}
