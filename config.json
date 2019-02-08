@@ -59,7 +59,7 @@
 			"type": "Silver_01",
 			"surfaceArea": 15,
 			"startDepth": 40,
-			"depth": 6,
+			"depth": 5,
 			"testColourHex": "A0A0A0"
 		},
 		{
@@ -81,20 +81,20 @@
 		{
 			"id": 144,
 			"type": "Uraninite_01",
-			"surfaceArea": 3,
+			"surfaceArea": 7,
 			"density": 0.7,
 			"startDepth": 70,
-			"depth": 3,
+			"depth": 4,
 			"surfaceHintProbability": 0.2,
 			"testColourHex": "00FF00"
 		},
 		{
 			"id": 192,
 			"type": "Platinum_01",
-			"surfaceArea": 5,
+			"surfaceArea": 10,
 			"density": 0.6,
 			"startDepth": 120,
-			"depth": 3,
+			"depth": 4,
 			"surfaceHintProbability": 0.2,
 			"testColourHex": "5D188E"
 		}
@@ -222,7 +222,8 @@
 				},
 				{
 					"id": 192,
-					"p": 0.6			
+					"p": 0.6,
+					"surfaceArea": 15			
 				}
 			]
 		},
@@ -335,10 +336,13 @@
 					"id": 168
 				},
 				{
-					"id": 144
+					"id": 144,
+					"p": 0.1,
+					"surfaceArea": 5
 				},
 				{
-					"id": 192
+					"id": 192,
+					"p": 0.1
 				}
 			]
 		}
