@@ -1,20 +1,26 @@
 package core;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import config.GlobalConfig;
+import config.OreConfig;
 import config.PlanetConfig;
 import map.MapData;
 import map.MapHandler;
+import nu.xom.Attribute;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Node;
+import nu.xom.Nodes;
 
 public class Main {
 	GlobalConfig config;
@@ -48,10 +54,48 @@ public class Main {
 	public void updatePlanetGeneratorDefinitions() {
 		try {
 			System.out.println("Attempting to update PlanetGeneratorDefinitions file..");
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = dbf.newDocumentBuilder();
+			Map<String, PlanetConfig> planetLookup = new HashMap<String, PlanetConfig>();
+			for(PlanetConfig pc : config.planets) {
+				planetLookup.put(pc.name, pc);
+			}
 			File f = new File(config.planetMaterialsFilePath);
-			Document doc = builder.parse(f);
+			Builder parser = new Builder(false);
+			Document doc = parser.build(f);
+			Nodes definitions = doc.query("Definitions/Definition");
+			for(int i = 0; i < definitions.size();++i) {
+				Node def = definitions.get(i);
+				String subTypeId = def.query("Id/SubtypeId").get(0).getValue();
+				if(planetLookup.containsKey(subTypeId)) {
+					PlanetConfig planet = planetLookup.get(subTypeId);
+					Node oreMappings = def.query("OreMappings").get(0);
+					Element e = (Element)oreMappings;
+					e.removeChildren();
+					for(int j = 0; j < planet.ores.length; ++j) {
+						OreConfig ore = planet.ores[j];
+						Element oreElement = new Element("Ore");
+						oreElement.addAttribute(new Attribute("Value", Integer.toString(ore.id)));
+						oreElement.addAttribute(new Attribute("Type", ore.type));
+						oreElement.addAttribute(new Attribute("Start", Integer.toString(ore.startDepth)));
+						oreElement.addAttribute(new Attribute("Depth", Integer.toString(ore.depth)));
+						oreElement.addAttribute(new Attribute("TargetColor", ore.mappingFileTargetColour));
+						oreElement.addAttribute(new Attribute("ColorInfluence", ore.mappingFileTargetColour));
+						e.appendChild(oreElement);
+					}
+				}
+			}
+			PrintWriter writer = new PrintWriter(f);
+			writer.print(doc.toXML());
+			writer.close();
+//			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//			DocumentBuilder builder = dbf.newDocumentBuilder();
+//			
+//			Document doc = builder.parse(f);
+
+//			NodeList definitions = doc.getElementsByTagName("Definition");
+//			for(int i = 0; i < definitions.getLength(); ++i) {
+//				Node definition = definitions.item(i);
+//				String subTypeId = definition.
+//			}
 			System.out.println("Updated PlanetGeneratorDefinitions file");
 		}
 		catch(Exception e) {

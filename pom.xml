@@ -18,5 +18,12 @@
 			<artifactId>commons-math3</artifactId>
 			<version>3.3</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/xom/xom -->
+		<dependency>
+			<groupId>xom</groupId>
+			<artifactId>xom</artifactId>
+			<version>1.2.5</version>
+		</dependency>
+
 	</dependencies>
 </project>

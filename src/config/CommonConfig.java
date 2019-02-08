@@ -7,7 +7,7 @@ public abstract class CommonConfig {
 	public int maxOreTiles = -1;
 	public int maxOrePatches = -1;
 	public Long seed = null;
-	public double occurenceProbility = -1;
+	public double p = -1;
 	public float density = -1;
 	public int shape = -1;
 	public Boolean avoidIce = null;
@@ -38,8 +38,8 @@ public abstract class CommonConfig {
 		if(seed == null) {
 			seed = other.seed;
 		}
-		if(occurenceProbility == -1) {
-			occurenceProbility = other.occurenceProbility;
+		if(p == -1) {
+			p = other.p;
 		}
 		if(density == -1) {
 			density = other.density;

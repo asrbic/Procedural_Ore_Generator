@@ -26,7 +26,7 @@ public class Generator {
 		List<Pair<OreConfig, Double>> tempPairedList = new ArrayList<Pair<OreConfig, Double>>();
 		Map<OreConfig, Long> oreTileCounts = new HashMap<OreConfig, Long>();
 		for(OreConfig ore : planetConfig.ores) {
-			tempPairedList.add(new Pair<OreConfig, Double>(ore, ore.occurenceProbility));
+			tempPairedList.add(new Pair<OreConfig, Double>(ore, ore.p));
 			oreTileCounts.put(ore, new Long(0));
 		}
 		EnumeratedDistribution<OreConfig> oreDist = new EnumeratedDistribution<OreConfig>(tempPairedList);
