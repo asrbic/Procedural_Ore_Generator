@@ -5,8 +5,8 @@ import static map.MapData.OPAQUE;
 public class OreConfig extends CommonConfig {
 	public String type = null;
 	public int id;
-	public int centreOreTile = -1;
-	public Integer testColour = null;
+	public transient Integer testColour = null;
+	
 	public OreConfig() {
 		
 	}
@@ -16,20 +16,24 @@ public class OreConfig extends CommonConfig {
 			surfaceHintColour = 0xFF000000 | (surfaceHintColour << 16);
 		}
 		super.cascadeSettings(other);
-		if(makeColouredMaps != null && makeColouredMaps) {//get around lack of unsigned ints 
-			testColour = Integer.parseInt(testColourHex, 16) | OPAQUE;
-		}
 		if(other instanceof OreConfig) {
 			OreConfig otherOre = (OreConfig)other;
 			if(type == null) {
 				type = otherOre.type;
 			}
-			if(centreOreTile == -1) {
-				centreOreTile = otherOre.centreOreTile;
-			}
-			if(testColour == null) {
-				testColour = otherOre.testColour;
-			}
+		}
+		if(testColourHex != null) {
+			testColour = Integer.parseInt(testColourHex, 16) | OPAQUE;
+		}
+	}
+	
+	public String getOreName() {
+		int suffixStartIndex = type.indexOf('_');
+		if(suffixStartIndex != -1 && suffixStartIndex > 0) {
+			return type.substring(0, suffixStartIndex);
+		}
+		else {
+			return type;
 		}
 	}
 }

@@ -1,107 +1,67 @@
 package core;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.StringWriter;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import config.GlobalConfig;
-import config.OreConfig;
 import config.PlanetConfig;
 import map.MapData;
 import map.MapHandler;
-import nu.xom.Attribute;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Node;
-import nu.xom.Nodes;
+import xml.XMLConfigUpdater;
 
 public class Main {
+	public static final Logger logger = LogManager.getLogger("Main");
+
 	GlobalConfig config;
 	MapData mapData;
 	Generator generator;
+	XMLConfigUpdater xmlUpdater;
 	Thread[] imageWriterThreads;
-
+	
 	public static void main(String[] args) {
 		new Main().run();
 	}
 	
 	Main() {
-//		generateTestConfig();
 		mapData = new MapData();
 		generator = new Generator();
+		xmlUpdater = new XMLConfigUpdater();
 	}
 	
 	public void run() {
 		String configFile = "config.json";
-		System.out.println("Attempting to load " + configFile);
+		logger.info("Attempting to load " + configFile);
 		config = GlobalConfig.loadConfig(configFile);
+		GlobalConfig defaultConfig = new GlobalConfig();
+		defaultConfig.setDefaults();
+		config.copyDefaults(defaultConfig);
 		config.cascadeSettings();
 		if(config.planetMaterialsFilePath != null) {
-			updatePlanetGeneratorDefinitions();
+			xmlUpdater.updatePlanetGeneratorDefinitions(config);
 		}
-		imageWriterThreads = new Thread[config.planets.length];
-		generate();
-		System.out.println("Waiting for all image compression/writer threads to finish...");
+		if(!config.makeColouredMaps) {
+			deleteColouredTestFiles();
+		}
+		if(config.planetDataPath != null) {
+			imageWriterThreads = new Thread[config.planets.length];
+			generate();
+			logger.info("Steam workshop table summary:\n" + getSteamWorkshopSummary());
+		}
+		logger.info("Waiting for all image compression/writer threads to finish...");
 	}
 	
-	public void updatePlanetGeneratorDefinitions() {
-		try {
-			System.out.println("Attempting to update PlanetGeneratorDefinitions file..");
-			Map<String, PlanetConfig> planetLookup = new HashMap<String, PlanetConfig>();
-			for(PlanetConfig pc : config.planets) {
-				planetLookup.put(pc.name, pc);
-			}
-			File f = new File(config.planetMaterialsFilePath);
-			Builder parser = new Builder(false);
-			Document doc = parser.build(f);
-			Nodes definitions = doc.query("Definitions/Definition");
-			for(int i = 0; i < definitions.size();++i) {
-				Node def = definitions.get(i);
-				String subTypeId = def.query("Id/SubtypeId").get(0).getValue();
-				if(planetLookup.containsKey(subTypeId)) {
-					PlanetConfig planet = planetLookup.get(subTypeId);
-					Node oreMappings = def.query("OreMappings").get(0);
-					Element e = (Element)oreMappings;
-					e.removeChildren();
-					for(int j = 0; j < planet.ores.length; ++j) {
-						OreConfig ore = planet.ores[j];
-						Element oreElement = new Element("Ore");
-						oreElement.addAttribute(new Attribute("Value", Integer.toString(ore.id)));
-						oreElement.addAttribute(new Attribute("Type", ore.type));
-						oreElement.addAttribute(new Attribute("Start", Integer.toString(ore.startDepth)));
-						oreElement.addAttribute(new Attribute("Depth", Integer.toString(ore.depth)));
-						oreElement.addAttribute(new Attribute("TargetColor", ore.mappingFileTargetColour));
-						oreElement.addAttribute(new Attribute("ColorInfluence", ore.mappingFileTargetColour));
-						e.appendChild(oreElement);
-					}
-				}
-			}
-			PrintWriter writer = new PrintWriter(f);
-			writer.print(doc.toXML());
-			writer.close();
-//			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//			DocumentBuilder builder = dbf.newDocumentBuilder();
-//			
-//			Document doc = builder.parse(f);
 
-//			NodeList definitions = doc.getElementsByTagName("Definition");
-//			for(int i = 0; i < definitions.getLength(); ++i) {
-//				Node definition = definitions.item(i);
-//				String subTypeId = definition.
-//			}
-			System.out.println("Updated PlanetGeneratorDefinitions file");
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
 	public void generate() {
 		int threadId = 0;
@@ -109,34 +69,78 @@ public class Main {
 			MapData mapData = new MapData();
 			MapHandler handler = new MapHandler(mapData, Paths.get(config.planetDataPath, planetConfig.name).toString(), 
 					Paths.get(config.planetDataOutputPath, planetConfig.name).toString(), planetConfig.surfaceHintMaps, planetConfig.makeColouredMaps);
-			System.out.println("Processing planet \"" + planetConfig.name + "\"");
-			System.out.println("\tLoading map data from: " + Paths.get(config.planetDataPath, planetConfig.name).toString());
+			logger.info("Processing planet \"" + planetConfig.name + "\"");
+			logger.info("\tLoading map data from: " + Paths.get(config.planetDataPath, planetConfig.name).toString());
 			handler.loadMapData();
 			if(config.countExistingTiles) {
 				mapData.countTiles();
 			}
-			System.out.println("\tClearing existing ore data");
+			logger.info("\tClearing existing ore data");
 			mapData.clearOreData();
-			System.out.println("\tGenerating ore tiles with effective ore configs:\n" + toJSON(planetConfig.ores));
+			logger.info("\tGenerating ore tiles with effective ore configs:\n" + toJSON(planetConfig.ores));
 			long tilesGenerated = generator.generatePatches(mapData, planetConfig);
-			System.out.println("\tTiles generated:" + tilesGenerated);
-			System.out.println("\tWriting ore data to map images in: " + Paths.get(config.planetDataOutputPath, planetConfig.name).toString());
+			logger.info("\tTiles generated:" + tilesGenerated);
+			logger.info("\tWriting ore data to map images in: " + Paths.get(config.planetDataOutputPath, planetConfig.name).toString());
 			imageWriterThreads[threadId] = new Thread(handler);
 			imageWriterThreads[threadId].start();
 			++threadId;
 		}
 	}
 	
-	public void generateTestConfig() {
-//		OreConfig[] ores = {new OreConfig(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0, "0xFFFFFF"),
-//					  new OreConfig(10, 0.2, 100, 1.0f, 1, 1.0f, false, 0, "0xFFF000")};
-//		configs = new ArrayList<GlobalConfig>();	
-		
+	public String getSteamWorkshopSummary() {
+		List<String> uniqueOres = new ArrayList<String>();
+		for(String planetName : generator.tileCountMap.keySet()) {
+			for(String oreName : generator.tileCountMap.get(planetName).keySet()) {
+				if(!uniqueOres.contains(oreName)) {
+					uniqueOres.add(oreName);
+				}
+			}
+		}
+		StringWriter w = new StringWriter();
+		w.append("[table]\n")
+		.append("[tr]\n")
+		.append("[th][/th]\n");
+		List<String> planetNames = new ArrayList<String>();
+		for(PlanetConfig planet : config.planets) {
+			if(generator.tileCountMap.containsKey(planet.name)) {
+				w.append("[th]" + planet.name + "[/th]\n");
+				planetNames.add(planet.name);
+			}
+		}
+		w.append("[/tr]\n");
+		for(String oreName : uniqueOres) {
+
+			w.append("[tr][th]" + oreName + "[/th]\n");
+			for(String planetName : planetNames) {
+				Long oreCount = generator.tileCountMap.get(planetName).get(oreName);
+				if(oreCount == null) {
+					oreCount = 0l;
+				}
+				w.append("[td]" + oreCount + "[/td]\n");
+			}
+			w.append("[/tr]\n");
+		}
+		w.append("[/table]\n");
+		return w.toString();
 	}
 	
 	String toJSON(Object o) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(o);
+	}
+	
+	private void deleteColouredTestFiles() {
+		for(PlanetConfig planet : config.planets) {
+			File planetDir = Paths.get(config.planetDataOutputPath, planet.name).toFile();
+			if(planetDir.exists()) {
+				File[] images = planetDir.listFiles((File dir, String name) -> {
+					return name.contains("coloured");
+				});
+				for(File image : images) {
+					image.delete();
+				}
+			}
+		}
 	}
 	
 

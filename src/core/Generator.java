@@ -1,5 +1,9 @@
 package core;
 
+import static map.MapData.ICE_FILTER;
+import static map.MapData.ORE_EXCLUDER;
+import static map.MapData.ORE_FILTER;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,22 +11,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import config.OreConfig;
-import config.PlanetConfig;
-import map.MapData;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static map.MapData.OPAQUE;
-import static map.MapData.ICE_FILTER;
-import static map.MapData.ORE_EXCLUDER;
-import static map.MapData.ORE_FILTER;
-
+import config.OreConfig;
+import config.PlanetConfig;
+import map.MapData;
 public class Generator {
+	public static final Logger logger = LogManager.getLogger("Generator");
+	Map<String, Map<String, Long>> tileCountMap = new HashMap<String, Map<String, Long>>();
 	
 	public long generatePatches(MapData mapData, PlanetConfig planetConfig) {
+		Map<String, Long> planetTileCountMap = new HashMap<String, Long>();
 		List<Pair<OreConfig, Double>> tempPairedList = new ArrayList<Pair<OreConfig, Double>>();
 		Map<OreConfig, Long> oreTileCounts = new HashMap<OreConfig, Long>();
 		for(OreConfig ore : planetConfig.ores) {
@@ -36,13 +40,20 @@ public class Generator {
 		for(int i = 0; i < planetConfig.maxOrePatches && generatedTiles < planetConfig.maxOreTiles; ++i) {
 			OreConfig ore = oreDist.sample();
 			int generatedTilesForOre = generateOrePatch(mapData, ore, rand);
+			if(planetTileCountMap.containsKey(ore.getOreName())) {
+				planetTileCountMap.put(ore.getOreName(), planetTileCountMap.get(ore.getOreName()).longValue() + generatedTilesForOre);
+			}
+			else {
+				planetTileCountMap.put(ore.getOreName(), new Long(generatedTilesForOre));
+			}
 			generatedTiles += generatedTilesForOre;
 			oreTileCounts.put(ore, oreTileCounts.get(ore).longValue() + generatedTilesForOre);
 		}
 
 		for(OreConfig ore : oreTileCounts.keySet()) {
-			System.out.println("\t\tTiles generated for ore " + ore.type + " (id:" + ore.id + ") with testColour " + Integer.toHexString(ore.testColour) + " : " + oreTileCounts.get(ore));
+			logger.info("\t\tTiles generated for ore " + ore.type + " (id:" + ore.id + ") with testColour " + Integer.toHexString(ore.testColour) + " : " + oreTileCounts.get(ore));
 		}
+		tileCountMap.put(planetConfig.name, planetTileCountMap);
 		return generatedTiles;
 	}
 	

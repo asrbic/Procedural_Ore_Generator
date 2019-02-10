@@ -1,16 +1,17 @@
 package map;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class MapHandler implements Runnable {
+	public static final Logger logger = LogManager.getLogger("MapHandler");
 
 public static final String MAT = "_mat.png";
 public static final String ADD = "_add.png";

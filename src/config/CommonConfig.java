@@ -21,7 +21,8 @@ public abstract class CommonConfig {
 	public int depth = -1;
 	public String mappingFileTargetColour = null;
 	public int mappingFileColourInfluence = -1;
-
+	public int centreOreTile = -1;
+	
 	public void cascadeSettings(CommonConfig other) {
 		if(patchSizeMultiplier == -1) {
 			patchSizeMultiplier = other.patchSizeMultiplier;
@@ -80,5 +81,31 @@ public abstract class CommonConfig {
 		if(mappingFileColourInfluence == -1) {
 			mappingFileColourInfluence = other.mappingFileColourInfluence;
 		}
+		if(centreOreTile == -1) {
+			centreOreTile = other.centreOreTile;
+		}
+	}
+	
+	public void setDefaults() {
+		patchSizeMultiplier = 1.0f;
+		patchSizeVariance = 0.4f;
+		maxOreTiles = 100000;
+		maxOrePatches = 1000;
+		seed = 7l;
+		p = 0.0;
+		density = 1.0f;
+		shape = 1;
+		avoidIce = true;
+		surfaceArea = 20;
+		surfaceHintMaps = true;
+		surfaceHintProbability = 1.0f;
+		surfaceHintColour = 128;
+		makeColouredMaps = true;
+		testColourHex = "FFFFFF";
+		startDepth = 10;
+		depth = 6;
+		mappingFileTargetColour = "#616c83";
+		mappingFileColourInfluence = 15;
+		centreOreTile = -1;
 	}
 }

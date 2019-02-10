@@ -10,6 +10,8 @@ public class PlanetConfig extends CommonConfig {
 		}
 		super.cascadeSettings(parent);
 		for(OreConfig ore : ores) {
+			ore.makeColouredMaps = null;
+			ore.surfaceHintMaps = null;
 			ore.cascadeSettings(this);
 		}
 	}

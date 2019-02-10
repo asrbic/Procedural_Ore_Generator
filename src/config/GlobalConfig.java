@@ -1,5 +1,4 @@
 package config;
-import static map.MapData.OPAQUE;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -16,15 +15,15 @@ import javax.swing.JOptionPane;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 public class GlobalConfig extends CommonConfig {
-	public String planetDataPath;
-	public String planetDataOutputPath;
+	public String planetDataPath = null;
+	public String planetDataOutputPath = null;
 	
-	public boolean countExistingTiles = true;
+	public Boolean countExistingTiles = null;
 	public String planetMaterialsFilePath = null;
 	public OreConfig[] oreTemplates;
 	public PlanetConfig[] planets;
+	
 	public static GlobalConfig loadConfig(String path) {
 		Gson gson = new Gson();
 		byte[] encoded;
@@ -66,6 +65,8 @@ public class GlobalConfig extends CommonConfig {
 		//add opacity
 		Map<Integer, OreConfig> oreLookup = new HashMap<Integer, OreConfig>();
 		for(OreConfig oreTemplate : oreTemplates) {
+			oreTemplate.makeColouredMaps = null;
+			oreTemplate.surfaceHintMaps = null;
 			oreLookup.put(oreTemplate.id, oreTemplate);
 		}
 		surfaceHintColour = 0xFF000000 | (surfaceHintColour << 16);
@@ -76,6 +77,22 @@ public class GlobalConfig extends CommonConfig {
 				}
 			}
 			planetConfig.cascadeSettings(this);
+		}
+	}
+	
+	public void setDefaults() {
+		super.setDefaults();
+		planetDataOutputPath = "./PlanetDataFiles/";
+		countExistingTiles = true;
+	}
+	
+	public void copyDefaults(GlobalConfig other) {
+		super.cascadeSettings(other);
+		if(planetDataOutputPath == null) {
+			planetDataOutputPath = other.planetDataOutputPath;
+		}
+		if(countExistingTiles == null) {
+			countExistingTiles = other.countExistingTiles;
 		}
 	}
 

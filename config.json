@@ -1,26 +1,7 @@
 {
 	"planetDataPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\",
-	"planetDataOutputPath": "./PlanetDataFiles/",
-	"countExistingTiles": true,
-	"patchSizeMultiplier": 1.0,
-	"patchSizeVariance": 0.4,
-	"maxOreTiles": 100000,
-	"maxOrePatches": 1000,
-	"loadSurfaceHintMaps": true,
-	"makeColouredMaps": true,
-	"testColourHex": "FFFFFF",
-	"density": 1.0,
-	"p": 0.0,
-	"avoidIce": true,
-	"shape": 1,
-	"surfaceHintProbability": 1.0,
-	"surfaceHintMaps": true,
-	"surfaceHintColour": 128,
-	"seed": 1,
-	"surfaceArea": 50,
 	"planetMaterialsFilePath": "./PlanetGeneratorDefinitions.sbc",
-	"mappingFileColourInfluence": 15,
-	"mappingFileTargetColour": "#616c83",
+	"makeColouredMaps": true,
 	"oreTemplates": [
 		{
 			"id": 1,
@@ -185,7 +166,6 @@
 		{
 			"name": "Mars",
 			"seed": 3,
-			"surfaceHintColour": 128,
 			"ores": [
 				{
 					"id": 1,
@@ -223,14 +203,13 @@
 				{
 					"id": 192,
 					"p": 0.6,
-					"surfaceArea": 15			
+					"surfaceArea": 25			
 				}
 			]
 		},
 		{
 			"name": "Europa",
 			"seed": 4,
-			"surfaceHintColour": 128,
 			"ores": [
 				{
 					"id": 1,
@@ -298,7 +277,8 @@
 				},
 				{
 					"id": 144,
-					"p": 1.0
+					"p": 1.0,
+					"surfaceArea": 25
 				},
 				{
 					"id": 192
@@ -308,7 +288,6 @@
 		{
 			"name": "Titan",
 			"seed": 6,
-			"surfaceHintColour": 128,
 			"ores": [
 				{
 					"id": 1,
@@ -342,7 +321,7 @@
 				},
 				{
 					"id": 192,
-					"p": 0.1
+					"p": 0.3
 				}
 			]
 		}

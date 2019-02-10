@@ -4,8 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class MapData {
-	
+	public static final Logger logger = LogManager.getLogger("MapData");
+
 	public static final int FRONT = 0;
 	public static final int LEFT = 1;
 	public static final int RIGHT = 2;
@@ -63,7 +67,7 @@ public class MapData {
 				for(int j = 0; j < colouredImg.getWidth(); ++j) {
 					for(int k = 0; k < colouredImg.getHeight(); ++k) {
 						int pixRGB = colouredImg.getRGB(j, k) & ORE_EXCLUDER;
-						
+						//convert coloured test image to greyscale
 						int rgb[] = new int[] {
 						        (pixRGB >> 16) & 0xff, //red
 						        (pixRGB >>  8) & 0xff, //green
@@ -104,7 +108,7 @@ public class MapData {
 	}
 	
 	public void countTiles() {
-		System.out.println("\tCounting existing ore tiles...");
+		logger.info("\tCounting existing ore tiles...");
 		long total = 0;
 		int mapCount = 1;
 		for(BufferedImage img : images) {
@@ -117,11 +121,11 @@ public class MapData {
 						}
 					}
 				}
-				System.out.println("\t\tMap " + mapCount++ + " existing tile count:" + tileCount);
+				logger.info("\t\tMap " + mapCount++ + " existing tile count:" + tileCount);
 				total += tileCount;
 			}
 		}
-		System.out.println("\tTotal existing tiles: " + total);
+		logger.info("\tTotal existing tiles: " + total);
 		
 	}
 }
