@@ -1,1 +1,53 @@
+#Procedural Ore Generator for Space Engineers
 
+## Description
+
+## How to use
+1. Locate the PlanetDataFiles directory containing the planet data directories for the planets you want to use as a base
+   - eg C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\ 
+2. Modify settings in config.json to suit your needs
+   - planetDataPath should equal the path from step 1
+   - The "name" for each planet config should be exactly the same as its corresponding directory name in the PlanetDataFiles from step 1
+   - planetMaterialsFilePath should be the location of planetDataFiles.sbc you want to use as a base
+     - This is in the Data directory above the directory from step 1
+   - All settings will cascade from oreTemplates -> all ores, global -> each planet then each planet -> its ores. Settings will not be overwritten if already set. This can minimise the amount of config you need to write.
+     - eg. "id": 1, "type": "Iron_02" in an ore template will set all ores on all planets which have the id 1 to have the default type Iron_02
+     - eg. "depth": 12 at the top level will set the default depth of all ores to 12
+   - Be very careful with the "" {} [] , characters. Make sure brackets are always closed and all elements but the last have a comma at the end of the line
+     - See https://www.json.org/
+3. Run the program with run.bat
+   - You might want to run with "makeColouredMaps": true until you get the output you want. Then run again with "makeColouredMaps": false or manually remove all of the coloured images from each planet directory
+
+4. Copy the contents to a new directory in C:\Users\<username>\AppData\Roaming\SpaceEngineers\Mods\
+5. Add the directory you created to the mod list of a game in Space Engineers and test. You do not need to create a new world.
+6. Select the directory containing your mod in the mod list and click Publish in the bottom right to upload it to the Steam Workshop
+tl;dr: run.bat
+
+## Configuration Options
+- planetDataPath (default null): Directory of PlanetDataFiles containing data for each planet. If null, no ore generation will occur. 
+- planetGeneratorDefinitionsPath (default null): Directory of PlanetGeneratorDefinitions.sbc to insert entries for configured ores. If null, no definitions file will be produced. 
+- planetDataOutputPath (default "./PlanetDataFiles/"): Output path for planet data. Not used if no planetDataPath is not set. Directory will be created if it doesn't exist.
+- planetGeneratorDefinitionsOutputPath (default "./"): Output path for PlanetGeneratorDefinitions.sbc. Not used if planetGeneratorDefinitionsPath is not set. Directory will be created if it doesn't exist.
+- makeColouredMaps (default true): Used at the global level to determine if colour coded test maps will be generated
+- surfaceHintMaps (default true): Used at the global level to determine whether hint maps will be generated
+- countExistingTiles (default true): If true, the existing ore tiles on the map will be counted before they get cleared
+
+- maxOreTiles (default 100000): total maximum ore tiles/pixels to generate on a planet. The actual number could be less than this because overwritten tiles are still counted
+- maxOrePatches (default 1000): total maximum ore patches to generate on a planet
+
+- p (default 0.0): Chance of this ore being selected to spawn. effective chance to spawn is (total of all p on this planet)/p
+- surfaceArea (default 20): Maximum number of tiles in an ore patch. Each tiles is about 30x30 square metres on EarthLike. This will likely be different for different sized planets
+- density (default 1.0): Lower that 1 increases the area and reduces density. Higher is the opposite
+- startDepth (default 10): Starting depth. Ore will fill from this down "depth" metres
+- depth (default 6): Vertical size of the ore patch
+- shape (default 1): not currently used
+- patchSizeVariance (default 0.4): Add random variance to the surfaceArea
+- avoidIce (default true): If true, this ore will not spawn on/under ice lakes
+- centreOreTile (default -1): If set to a positive number, the given id will be used as the centre tile of the ore patch. This can be used to generate a single hint tile of ore close to the surface while the rest of the patch is far below, out of ore detector range. Just add the ore you want to be at the centre to the planet's config with "p": 0.0 so it doesn't spawn elsewhere
+- seed (default 7): Random seed used at the planet level. With the exact same configuration (including seed), the exact same ore patches should be generated. 
+- surfaceAreaMultiplier (default: 1.0): Multiplier to increase/decrease surface area
+- surfaceHintProbability (default 1.0): Chance that surface hints will show above each ore tile. Set to 0.0 to have no surface hint
+- surfaceHintColour (default 28): Colour of surface hints. This seems to change per planet/biome
+- testColourHex (default "FFFFFF"): 24-bit hexadecimal rgb colour which this ore will show as in the colour coded test maps
+- mappingFileTargetColour (default "#616c83"): Required in PlanetGeneratorDefinitions.sbc for each ore. I'm not actually sure what this does but most of the vanilla ores have the default for this.
+- mappingFileColourInfluence (default 15): Also unsure what this does. Similar usage in PlanetGeneratorDefinitions.sbc but is always 15
