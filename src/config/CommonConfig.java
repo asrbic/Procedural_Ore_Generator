@@ -2,8 +2,8 @@ package config;
 
 public abstract class CommonConfig {
 	
-	public float patchSizeMultiplier = -1;
-	public float patchSizeVariance = -1;
+	public float surfaceAreaMultiplier = -1;
+	public float surfaceAreaVariance = -1;
 	public int maxOreTiles = -1;
 	public int maxOrePatches = -1;
 	public Long seed = null;
@@ -24,11 +24,11 @@ public abstract class CommonConfig {
 	public int centreOreTile = -1;
 	
 	public void cascadeSettings(CommonConfig other) {
-		if(patchSizeMultiplier == -1) {
-			patchSizeMultiplier = other.patchSizeMultiplier;
+		if(surfaceAreaMultiplier == -1) {
+			surfaceAreaMultiplier = other.surfaceAreaMultiplier;
 		}
-		if(patchSizeVariance == -1) {
-			patchSizeVariance = other.patchSizeVariance;
+		if(surfaceAreaVariance == -1) {
+			surfaceAreaVariance = other.surfaceAreaVariance;
 		}
 		if(maxOreTiles == -1) {
 			maxOreTiles = other.maxOreTiles;
@@ -87,8 +87,8 @@ public abstract class CommonConfig {
 	}
 	
 	public void setDefaults() {
-		patchSizeMultiplier = 1.0f;
-		patchSizeVariance = 0.4f;
+		surfaceAreaMultiplier = 1.0f;
+		surfaceAreaVariance = 0.4f;
 		maxOreTiles = 100000;
 		maxOrePatches = 1000;
 		seed = 7l;

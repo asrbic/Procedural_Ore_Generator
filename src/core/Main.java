@@ -27,7 +27,7 @@ public class Main {
 	MapData mapData;
 	Generator generator;
 	XMLConfigUpdater xmlUpdater;
-	Thread[] imageWriterThreads;
+	Thread[] imageWriterThreads = null;
 	
 	public static void main(String[] args) {
 		new Main().run();
@@ -47,7 +47,7 @@ public class Main {
 		defaultConfig.setDefaults();
 		config.copyDefaults(defaultConfig);
 		config.cascadeSettings();
-		if(config.planetMaterialsFilePath != null) {
+		if(config.planetGeneratorDefinitionsPath != null) {
 			xmlUpdater.updatePlanetGeneratorDefinitions(config);
 		}
 		if(!config.makeColouredMaps) {
@@ -58,7 +58,22 @@ public class Main {
 			generate();
 			logger.info("Steam workshop table summary:\n" + getSteamWorkshopSummary());
 		}
-		logger.info("Waiting for all image compression/writer threads to finish...");
+		if(imageWriterThreads != null) {
+			logger.info("Waiting for all image compression/writer threads to finish...");
+			int i = 0;
+			for(Thread t : imageWriterThreads) {
+				try{
+					t.join();
+					logger.info("Images for " + config.planets[i].name + " done");
+				}
+				catch(InterruptedException e) {
+					logger.error(e);
+				}
+				++i;
+			}
+			logger.info("All Image compression/writer threads complete");
+		}
+		logger.info("Done. exiting...");
 	}
 	
 

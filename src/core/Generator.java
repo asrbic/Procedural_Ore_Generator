@@ -65,7 +65,7 @@ public class Generator {
 		int startRowIndex = rand.nextInt(mapSize);
 		Random tileRand = new Random(rand.nextLong());
 		Random hintRand = new Random(rand.nextLong());
-		int patchSize = Math.round((ore.surfaceArea * ore.patchSizeMultiplier) * (1 + (tileRand.nextFloat() * 2 - 1) * ore.patchSizeVariance));
+		int patchSize = Math.round((ore.surfaceArea * ore.surfaceAreaMultiplier) * (1 + (tileRand.nextFloat() * 2 - 1) * ore.surfaceAreaVariance));
 		float patchRadius = Math.round(Math.sqrt((double)patchSize) / (ore.density * 3));
 		float squash = tileRand.nextFloat() * 1.0f + 0.75f;
 		float horizontalSquash;
@@ -79,7 +79,7 @@ public class Generator {
 			horizontalSquash = 1 / squash;			
 		}
 		
-		int oreId = ore.centreOreTile == -1 ? ore.id : ore.centreOreTile;
+		int oreId = ore.centreOreTile >= 0 ? ore.centreOreTile : ore.id;
 		
 		boolean avoidIce = ore.avoidIce;
 		boolean isSurfaceHint = ore.surfaceHintMaps && ore.surfaceHintProbability > 0;

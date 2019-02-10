@@ -2,6 +2,7 @@ package xml;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +31,12 @@ public class XMLConfigUpdater {
 			for (PlanetConfig pc : config.planets) {
 				planetLookup.put(pc.name, pc);
 			}
-			File f = new File(config.planetMaterialsFilePath);
+			File f = new File(config.planetGeneratorDefinitionsPath);
 			if (!f.exists()) {
 				JOptionPane.showMessageDialog(null,
-						"Unable to find file: " + config.planetMaterialsFilePath, "Cannot find planet generator definitions file",
+						"Unable to find file: " + config.planetGeneratorDefinitionsPath, "Cannot find planet generator definitions file",
 						JOptionPane.ERROR_MESSAGE);
-				logger.error("Unable to find file: " + config.planetMaterialsFilePath);
+				logger.error("Unable to find file: " + config.planetGeneratorDefinitionsPath);
 				return false;
 			}
 			Builder parser = new Builder(false);
@@ -63,16 +64,17 @@ public class XMLConfigUpdater {
 					}
 				}
 			}
-			PrintWriter writer = new PrintWriter(f);
+			File out = Paths.get(config.planetGeneratorDefinitionsOutputPath + "PlanetGeneratorDefinitions.sbc").toFile();
+			PrintWriter writer = new PrintWriter(out);
 			writer.print(doc.toXML());
 			writer.close();
 			logger.info("Updated PlanetGeneratorDefinitions file");
 			return true;
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null,
-					"Unable to parse " + config.planetMaterialsFilePath + "\n" + e.toString(), "XML parse error",
+					"Unable to parse " + config.planetGeneratorDefinitionsPath + "\n" + e.toString(), "XML parse error",
 					JOptionPane.ERROR_MESSAGE);
-			logger.error("Unable to parse " + config.planetMaterialsFilePath + "\n" + e.toString());
+			logger.error("Unable to parse " + config.planetGeneratorDefinitionsPath + "\n" + e.toString());
 			return false;
 		}
 	}
