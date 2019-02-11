@@ -40,7 +40,11 @@ tl;dr: run.bat
 - density (default 1.0): Lower that 1 increases the area and reduces density. Higher is the opposite
 - startDepth (default 10): Starting depth. Ore will fill from this down "depth" metres
 - depth (default 6): Vertical size of the ore patch
-- shape (default 1): not currently used
+- shape (default 1): Determines the generator which will be used. There are currently 4 options:
+  1. Gaussain random: Will randomly select tiles with a strong tendency towards the centre of the patch. This typically leads to a dense centre with some isolated ore tiles around it.
+  2. Snake: Works a bit like the game snake. One of 4 random directions (up, down, left, right) will be chosen. From this new tile, a random direction is chosen again. Repeat. This is the simplest algorithm and leads to shapes most like vanilla. Note that this setting does not use the "desnity" setting
+  3. Step Gaussian lines: Will randomly select tiles with a strong tendency towards the centre of the patch. A line is then drawn to it by stepping up, down, left or right. This is probably my favourite. 
+  4. Fuzzy linearly interpolated Gaussian lines: Will randomly select tiles with a strong tendency towards the centre of the patch and draw a line from the current tile to it. Leads to some intersting shapes but patches are often smaller than specified.
 - patchSizeVariance (default 0.4): Add random variance to the surfaceArea
 - avoidIce (default true): If true, this ore will not spawn on/under ice lakes
 - centreOreTile (default -1): If set to a positive number, the given id will be used as the centre tile of the ore patch. This can be used to generate a single hint tile of ore close to the surface while the rest of the patch is far below, out of ore detector range. Just add the ore you want to be at the centre to the planet's config with "p": 0.0 so it doesn't spawn elsewhere

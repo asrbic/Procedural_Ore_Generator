@@ -22,6 +22,7 @@ import config.OreConfig;
 import config.PlanetConfig;
 import map.MapData;
 public class Generator {
+	public static final int[][] GEN_SIDES = {{1,0},{0,1},{-1,0},{0,-1}};
 	public static final Logger logger = LogManager.getLogger("Generator");
 	Map<String, Map<String, Long>> tileCountMap = new HashMap<String, Map<String, Long>>();
 	
@@ -92,8 +93,18 @@ public class Generator {
 		RandomGenerator randGen = new JDKRandomGenerator();
 		randGen.setSeed(tileRand.nextInt());
 		int iterations = 0;
-		int maxIterations = patchSize * 20;
-		
+		int maxIterations = patchSize * 30;
+		//for line shapes
+		int targetCol = startColIndex;
+		int targetRow = startRowIndex;
+		double linearCoefficient = 0;
+		double linearXDist = 0;
+		double linearXIncrement = 0;
+		int lineSourceColIndex = 0;
+		int lineSourceRowIndex = 0;
+		double colDiff = 0;
+		double rowDiff = 0;
+		boolean colMet, rowMet;
 		do {
 			//add patch tiles
 			//each tile/pixel corresponds to a 30x30m patch of ore in game - measured on EarthLike
@@ -122,10 +133,78 @@ public class Generator {
 			if(centreOreTile != -1 && iterations == 0) {
 				oreId = ore.id;
 			}
-			colIndex = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
-			rowIndex = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
+			// Handle different shapes
+			switch(ore.shape) {
+			case 4:
+				//fuzzy gaussian line
+				colMet = (colIndex >= targetCol && lineSourceColIndex <= targetCol) || (colIndex <= targetCol && lineSourceColIndex >= targetCol);
+				rowMet = (rowIndex >= targetRow && lineSourceRowIndex <= targetRow) || (rowIndex <= targetRow && lineSourceRowIndex >= targetRow);
+				if(colMet && rowMet) {
+					//new target
+					targetCol = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
+					targetRow = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
+					lineSourceColIndex = colIndex;
+					lineSourceRowIndex = rowIndex;
+					//dodge x/0
+					linearCoefficient = rowDiff / (colDiff == 0d ? colDiff + 0.4d : colDiff);
+					linearXIncrement = (colDiff / Math.abs(rowDiff)) * 0.2d;
+					linearXDist = 0;
+				}
+				colIndex = (int)Math.round(linearXDist + (double)tileRand.nextInt(3)-1) + lineSourceColIndex;
+				rowIndex = (int)Math.round((linearXDist*linearCoefficient) + (double)tileRand.nextInt(3)-1) + lineSourceRowIndex;
+				linearXDist += linearXIncrement;
+
+			break;
+			case 3:
+				//straight lines
+				colMet = (colIndex >= targetCol && lineSourceColIndex <= targetCol) || (colIndex <= targetCol && lineSourceColIndex >= targetCol);
+				rowMet = (rowIndex >= targetRow && lineSourceRowIndex <= targetRow) || (rowIndex <= targetRow && lineSourceRowIndex >= targetRow);
+				
+				if(colMet && rowMet) {
+					//new target
+					targetCol = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
+					targetRow = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
+					lineSourceColIndex = colIndex;
+					lineSourceRowIndex = rowIndex;
+				}
+				colDiff = targetCol - colIndex;
+				rowDiff = targetRow - rowIndex;
+				int colSign = colDiff >= 0 ? 1 : -1;
+				int rowSign = rowDiff >= 0 ? 1 : -1;
+				colDiff = Math.abs(colDiff);
+				rowDiff = Math.abs(rowDiff);
+				if(colDiff > rowDiff) {
+					colIndex += colSign;
+				}
+				else if(colDiff < rowDiff){
+					rowIndex += rowSign;
+				}
+				else {
+					if(tileRand.nextBoolean()) {
+						colIndex += colSign;
+					}
+					else {
+						rowIndex += rowSign;
+					}
+				}
+			break;
+			case 2:
+				//snek
+				int[] side = GEN_SIDES[tileRand.nextInt(GEN_SIDES.length)];
+				colIndex = colIndex + side[0];
+				rowIndex = rowIndex + side[1];
+			break;
+			default:
+			case 1:
+				//gaussian
+				colIndex = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
+				rowIndex = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
+			break;
+				
+			}
 		} while(tilesAdded < patchSize && ++iterations < maxIterations);
 		return tilesAdded;
 	}
+	
 	
 }

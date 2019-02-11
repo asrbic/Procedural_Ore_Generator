@@ -2,6 +2,7 @@
 	"planetDataPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\",
 	"planetGeneratorDefinitionsPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetGeneratorDefinitions.sbc",
 	"makeColouredMaps": true,
+	"shape": 4,
 	"oreTemplates": [
 		{
 			"id": 1,
@@ -16,6 +17,7 @@
 			"type": "Nickel_01",
 			"surfaceArea": 80,
 			"startDepth": 16,
+			"shape": 1,
 			"depth": 6,
 			"testColourHex": "FF9741"
 		},
@@ -24,6 +26,7 @@
 			"type": "Silicon_01",
 			"surfaceArea": 80,
 			"startDepth": 18,
+			"shape": 2,
 			"depth": 6,
 			"testColourHex": "FFFFFF"
 		},
@@ -33,6 +36,7 @@
 			"surfaceArea": 80,
 			"startDepth": 30,
 			"depth": 6,
+			"shape": 3,
 			"testColourHex": "0033FF"
 		},
 		{
