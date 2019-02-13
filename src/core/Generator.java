@@ -23,7 +23,10 @@ import config.PlanetConfig;
 import map.MapData;
 public class Generator {
 	public static final int[][] GEN_SIDES = {{1,0},{0,1},{-1,0},{0,-1}};
+	public static final int[][] GEN_SIDES_ALL = {{1,0},{0,1},{-1,0},{0,-1}, {1,1},{1,-1},{-1,1},{-1,-1}};
 	public static final Logger logger = LogManager.getLogger("Generator");
+	public static final int RANDOM_SHAPE = 1;
+	public static final int[] SHAPES = {2,3,4,5,6};
 	Map<String, Map<String, Long>> tileCountMap = new HashMap<String, Map<String, Long>>();
 	
 	public long generatePatches(MapData mapData, PlanetConfig planetConfig) {
@@ -59,15 +62,22 @@ public class Generator {
 	}
 	
 	private int generateOrePatch(MapData mapData, OreConfig ore, Random rand) {
+		// The ugly bit
 		int tilesAdded = 0;
 		int mapSize = mapData.getMapSize();
 		int mapIndex = rand.nextInt(MapData.MAP_SIDES);
 		int startColIndex = rand.nextInt(mapSize);
 		int startRowIndex = rand.nextInt(mapSize);
 		Random tileRand = new Random(rand.nextLong());
+		
 		Random hintRand = new Random(rand.nextLong());
+		int oreShape = ore.shape;
+		if(oreShape == RANDOM_SHAPE) {
+			oreShape = SHAPES[tileRand.nextInt(SHAPES.length)];
+		}
 		int patchSize = Math.round((ore.surfaceArea * ore.surfaceAreaMultiplier) * (1 + (tileRand.nextFloat() * 2 - 1) * ore.surfaceAreaVariance));
-		float patchRadius = Math.round(Math.sqrt((double)patchSize) / (ore.density * 3));
+		float patchDiameter = Math.round(Math.sqrt((double)patchSize) / (ore.density));
+		float patchRadius = patchDiameter / 2f;
 		float squash = tileRand.nextFloat() * 1.0f + 0.75f;
 		float horizontalSquash;
 		float verticalSquash;
@@ -79,7 +89,8 @@ public class Generator {
 			verticalSquash = squash;
 			horizontalSquash = 1 / squash;			
 		}
-		
+		int width = Math.round(patchDiameter * horizontalSquash);
+		int height = Math.round(patchDiameter * verticalSquash);
 		int oreId = ore.centreOreTile >= 0 ? ore.centreOreTile : ore.id;
 		
 		boolean avoidIce = ore.avoidIce;
@@ -90,8 +101,6 @@ public class Generator {
 		BufferedImage img = mapData.images[mapIndex];
 		BufferedImage hintImg = mapData.surfaceHintImages[mapIndex];
 		BufferedImage colouredImg = mapData.colouredMaps[mapIndex];
-		RandomGenerator randGen = new JDKRandomGenerator();
-		randGen.setSeed(tileRand.nextInt());
 		int iterations = 0;
 		int maxIterations = patchSize * 30;
 		//for line shapes
@@ -100,27 +109,43 @@ public class Generator {
 		double linearCoefficient = 0;
 		double linearXDist = 0;
 		double linearXIncrement = 0;
-		int lineSourceColIndex = 0;
-		int lineSourceRowIndex = 0;
+		int sourceColIndex = 0;
+		int sourceRowIndex = 0;
 		double colDiff = 0;
 		double rowDiff = 0;
 		boolean colMet, rowMet;
+		int lastColIndex = startColIndex;
+		int lastRowIndex = startRowIndex;
+		int halfWidth = width/2;
+		int halfHeight = height/2;
+		int x = 0 - halfWidth;
+		int y = 0 - halfHeight;
+		int layer = 1;
+		int foundCount = 0;
+		boolean found;
 		do {
-			//add patch tiles
-			//each tile/pixel corresponds to a 30x30m patch of ore in game - measured on EarthLike
-			if(rowIndex < mapSize && rowIndex >= 0 && colIndex < mapSize && colIndex >= 0) {
+			boolean paintTile = true;
+			// add patch tiles
+			// each tile/pixel corresponds to a 30x30m patch of ore in game - measured on EarthLike
+			if(rowIndex >= mapSize || rowIndex < 0 || colIndex >= mapSize || colIndex < 0) {
+				paintTile = false;
+			}
+			if(paintTile) {
 				int pixRGB = img.getRGB(colIndex, rowIndex);
 				if((pixRGB | ORE_FILTER) == oreId || (centreOreTile != 0 && (pixRGB | ORE_FILTER) == centreOreTile)) { 
-					continue;
+					paintTile = false;
 				}
 				if((avoidIce && ((pixRGB & ICE_FILTER) == ICE_FILTER))) {
 					if(iterations == 0) {
+						//If starting on an ice lake, abort
 						return 0;
 					}
 					else {
-						continue;
+						paintTile = false;
 					}
 				}
+			}
+			if(paintTile) {
 				img.setRGB(colIndex, rowIndex, (img.getRGB(colIndex, rowIndex) & ORE_EXCLUDER) | oreId);
 				++tilesAdded;
 				if(ore.makeColouredMaps) {
@@ -134,38 +159,111 @@ public class Generator {
 				oreId = ore.id;
 			}
 			// Handle different shapes
-			switch(ore.shape) {
-			case 4:
-				//fuzzy gaussian line
-				colMet = (colIndex >= targetCol && lineSourceColIndex <= targetCol) || (colIndex <= targetCol && lineSourceColIndex >= targetCol);
-				rowMet = (rowIndex >= targetRow && lineSourceRowIndex <= targetRow) || (rowIndex <= targetRow && lineSourceRowIndex >= targetRow);
+			switch(oreShape) {
+			case 7:
+				// diamonds
+				found = false;
+				while(!found) {
+					for(int i = 0; i < GEN_SIDES_ALL.length && !found;++i) {
+						int colInc = GEN_SIDES_ALL[i][0];
+						int rowInc = GEN_SIDES_ALL[i][1];
+						colDiff = Math.abs(startColIndex - (colIndex + colInc));
+						rowDiff = Math.abs(startRowIndex - (rowIndex + rowInc));
+						if(colDiff + rowDiff == layer && !(lastColIndex == colIndex + colInc && lastRowIndex == rowIndex + rowInc)) {
+
+							lastColIndex = colIndex;
+							lastRowIndex = rowIndex;
+							//paint it
+							colIndex += colInc;
+							rowIndex += rowInc;
+							
+							++foundCount;
+							double weightedColDiff = colDiff * horizontalSquash;
+							double weightedRowDiff = rowDiff * verticalSquash;
+							if(weightedColDiff * weightedColDiff + weightedRowDiff * weightedRowDiff < (tileRand.nextDouble() * patchRadius * patchRadius * 5)) {
+								found = true;
+							}
+						}
+					}
+					if((foundCount >= (4 * layer))) {
+						foundCount = foundCount % (4 * layer);
+						++layer;
+					}
+				}
+			break;
+			case 6:
+				// sparse circles
+				found = false;
+				while(!found) {
+					while((x <= halfWidth) && !found) {
+						while((y <= halfHeight) && !found) {
+							colDiff = startColIndex - x;
+							rowDiff = startRowIndex - y;
+							double crowDist = Math.sqrt((x * x) + (y * y)); 
+							if(Math.abs(crowDist - (double)layer) <= 1.0d) {
+								if(tileRand.nextDouble() /*- (1f / (float)Math.min(layer, patchRadius))*/ <= ore.density) {
+									colIndex = startColIndex + x;
+									rowIndex = startRowIndex + y;
+									found = true;
+								}
+							}
+							++y;
+						}
+						if(y > halfHeight) {
+							y = 0 - halfHeight;
+							++x;
+						}
+					}
+//					for(; y<=halfHeight && !found; y++) {
+//					    for(; x<=halfWidth && !found; x++) {
+//					        if(x*x*halfHeight*halfHeight+y*y*halfWidth*halfWidth <= halfHeight*halfHeight*halfWidth*halfWidth) {
+//					            colIndex = startColIndex + x;
+//					        	rowIndex = startRowIndex + y;
+//					        	found = true;
+//					        }
+//					    }
+//					}
+					if(!found) {
+						++layer;
+						x = 0 - halfWidth;
+						y = 0 - halfWidth;
+						break;
+					}
+				}
+			break;
+			case 5:
+				// fuzzy gaussian line
+				colMet = (colIndex >= targetCol && sourceColIndex <= targetCol) || (colIndex <= targetCol && sourceColIndex >= targetCol);
+				rowMet = (rowIndex >= targetRow && sourceRowIndex <= targetRow) || (rowIndex <= targetRow && sourceRowIndex >= targetRow);
 				if(colMet && rowMet) {
 					//new target
-					targetCol = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
-					targetRow = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
-					lineSourceColIndex = colIndex;
-					lineSourceRowIndex = rowIndex;
+					targetCol = startColIndex + Math.round((float)(tileRand.nextFloat() - 0.5d) * width);
+					targetRow = startRowIndex + Math.round((float)(tileRand.nextFloat() - 0.5d) * height);
+					sourceColIndex = colIndex;
+					sourceRowIndex = rowIndex;
+					colDiff = targetCol - colIndex;
+					rowDiff = targetRow - rowIndex;
 					//dodge x/0
 					linearCoefficient = rowDiff / (colDiff == 0d ? colDiff + 0.4d : colDiff);
 					linearXIncrement = (colDiff / Math.abs(rowDiff)) * 0.2d;
 					linearXDist = 0;
 				}
-				colIndex = (int)Math.round(linearXDist + (double)tileRand.nextInt(3)-1) + lineSourceColIndex;
-				rowIndex = (int)Math.round((linearXDist*linearCoefficient) + (double)tileRand.nextInt(3)-1) + lineSourceRowIndex;
+				colIndex = (int)Math.round(linearXDist + (double)tileRand.nextInt(3)-1) + sourceColIndex;
+				rowIndex = (int)Math.round((linearXDist*linearCoefficient) + (double)tileRand.nextInt(3)-1) + sourceRowIndex;
 				linearXDist += linearXIncrement;
 
 			break;
-			case 3:
-				//straight lines
-				colMet = (colIndex >= targetCol && lineSourceColIndex <= targetCol) || (colIndex <= targetCol && lineSourceColIndex >= targetCol);
-				rowMet = (rowIndex >= targetRow && lineSourceRowIndex <= targetRow) || (rowIndex <= targetRow && lineSourceRowIndex >= targetRow);
+			case 4:
+				// step Gaussian lines
+				colMet = (colIndex >= targetCol && sourceColIndex <= targetCol) || (colIndex <= targetCol && sourceColIndex >= targetCol);
+				rowMet = (rowIndex >= targetRow && sourceRowIndex <= targetRow) || (rowIndex <= targetRow && sourceRowIndex >= targetRow);
 				
 				if(colMet && rowMet) {
-					//new target
-					targetCol = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
-					targetRow = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
-					lineSourceColIndex = colIndex;
-					lineSourceRowIndex = rowIndex;
+					// new target
+					targetCol = startColIndex + Math.round((float)(tileRand.nextGaussian() - 0.5d) * width / 3);
+					targetRow = startRowIndex + Math.round((float)(tileRand.nextGaussian() - 0.5d) * height / 3);
+					sourceColIndex = colIndex;
+					sourceRowIndex = rowIndex;
 				}
 				colDiff = targetCol - colIndex;
 				rowDiff = targetRow - rowIndex;
@@ -176,7 +274,7 @@ public class Generator {
 				if(colDiff > rowDiff) {
 					colIndex += colSign;
 				}
-				else if(colDiff < rowDiff){
+				else if(colDiff < rowDiff) {
 					rowIndex += rowSign;
 				}
 				else {
@@ -188,17 +286,25 @@ public class Generator {
 					}
 				}
 			break;
-			case 2:
-				//snek
+			case 3:
+				// snek
 				int[] side = GEN_SIDES[tileRand.nextInt(GEN_SIDES.length)];
-				colIndex = colIndex + side[0];
-				rowIndex = rowIndex + side[1];
+				
+				if(colIndex > (startColIndex + width/2) || colIndex < (startColIndex - width/2) || 
+						rowIndex > (startRowIndex + height/2) || rowIndex < (startRowIndex - height/2)) {
+					colIndex = startColIndex + side[0];
+					rowIndex = startRowIndex + side[1];
+				}
+				else {
+					colIndex = colIndex + side[0];
+					rowIndex = rowIndex + side[1];
+				}
 			break;
 			default:
-			case 1:
-				//gaussian
-				colIndex = startColIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * horizontalSquash);
-				rowIndex = startRowIndex + Math.round((float)(randGen.nextGaussian() * patchRadius) * verticalSquash);
+			case 2:
+				// gaussian
+				colIndex = startColIndex + Math.round((float)((tileRand.nextGaussian() - 0.5d) * patchDiameter *(1f/3f)) * horizontalSquash);
+				rowIndex = startRowIndex + Math.round((float)((tileRand.nextGaussian() - 0.5d) * patchDiameter * (1f/3f)) * verticalSquash);
 			break;
 				
 			}
