@@ -132,7 +132,7 @@ public class Generator {
 			}
 			if(paintTile) {
 				int pixRGB = img.getRGB(colIndex, rowIndex);
-				if((pixRGB | ORE_FILTER) == oreId || (centreOreTile != 0 && (pixRGB | ORE_FILTER) == centreOreTile)) { 
+				if((pixRGB | ORE_FILTER) == oreId || (centreOreTile != -1 && (pixRGB | ORE_FILTER) == centreOreTile)) { 
 					paintTile = false;
 				}
 				if((avoidIce && ((pixRGB & ICE_FILTER) == ICE_FILTER))) {
@@ -180,7 +180,8 @@ public class Generator {
 							++foundCount;
 							double weightedColDiff = colDiff * horizontalSquash;
 							double weightedRowDiff = rowDiff * verticalSquash;
-							if(weightedColDiff * weightedColDiff + weightedRowDiff * weightedRowDiff < (tileRand.nextDouble() * patchRadius * patchRadius * 5)) {
+							double crowSquared = weightedColDiff * weightedColDiff + weightedRowDiff * weightedRowDiff; 
+							if(Math.min(crowSquared, patchRadius * patchRadius * 2/3) < (tileRand.nextDouble() * patchRadius * patchRadius)) {
 								found = true;
 							}
 						}
