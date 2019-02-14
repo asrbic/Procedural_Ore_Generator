@@ -33,7 +33,7 @@ public class Main {
 		new Main().run();
 	}
 	
-	Main() {
+	public Main() {
 		mapData = new MapData();
 		generator = new Generator();
 		xmlUpdater = new XMLConfigUpdater();

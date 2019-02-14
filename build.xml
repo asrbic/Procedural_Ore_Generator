@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_release_zip" name="Create Runnable Jar for Project Procedural_Ore_Generator with Jar-in-Jar Loader">
+    <!--this file was created by Eclipse Runnable JAR file Export Wizard-->
+    <!--ANT 1.7 is required-->
+    <!--define folder properties
+    gson-2.8.2.jar commons-math3-3.3.jar xom-1.2.5.jar xml-apis-1.3.03.jar xercesImpl-2.8.0.jar xalan-2.7.0.jar log4j-api-2.11.2.jar log4j-core-2.11.2.jar-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="C:/Users/asrbic/repos/workspace"/>
+    <property name="dir.release" value="${dir.buildfile}/release"/>
+	<property name="dir.release.location" location="release" />
+	<property name ="jar.name" value="Procedural_Ore_Generator.jar" />
+    <target name="create_run_jar">
+		<antcall target="prepare_lib" />
+		<path id="lib.classpath">
+			<fileset dir="${dir.release}/lib/">
+				<include name="*.*" />
+			</fileset>
+		</path>
+		<pathconvert property="string.classpath" pathsep=" ">
+			<path refid="lib.classpath" />
+			<map from="${dir.release.location}" to="." />
+		</pathconvert>
+    	<jar destfile="${dir.release}/${jar.name}" >
+            <manifest>
+                <attribute name="Main-Class" value="core.Main"/>
+                <attribute name="Class-Path" value="./ ${string.classpath}"/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/target/classes"/>
+        </jar>
+    </target>
+	
+	<target name="prepare_lib">
+		<copy todir="${dir.release}/lib" >
+            <fileset dir="C:/Users/asrbic/.m2/repository/com/google/code/gson/gson/2.8.2" includes="gson-2.8.2.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/org/apache/commons/commons-math3/3.3" includes="commons-math3-3.3.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/xom/xom/1.2.5" includes="xom-1.2.5.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/xml-apis/xml-apis/1.3.03" includes="xml-apis-1.3.03.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/xerces/xercesImpl/2.8.0" includes="xercesImpl-2.8.0.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/xalan/xalan/2.7.0" includes="xalan-2.7.0.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/org/apache/logging/log4j/log4j-api/2.11.2" includes="log4j-api-2.11.2.jar"/>
+            <fileset dir="C:/Users/asrbic/.m2/repository/org/apache/logging/log4j/log4j-core/2.11.2" includes="log4j-core-2.11.2.jar"/>
+		</copy>
+	</target>
+	
+	<target name="create_release_zip">
+		<antcall target="create_run_jar" />
+		<zip destfile="${dir.release}/Procedural_Ore_Generator.zip">
+			<zipfileset dir="${dir.buildfile}" includes="config.json readme.md license.txt" />
+			<zipfileset dir="${dir.release}" includes="${jar.name} run.bat" />
+			<zipfileSet dir="${dir.release}" includes="lib lib/*" />
+		</zip>
+	</target>
+</project>
