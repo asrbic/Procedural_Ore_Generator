@@ -3,6 +3,9 @@
 ## Description
 
 ## How to use
+
+Requires Java version 1.8 or later.
+
 1. Locate the PlanetDataFiles directory containing the planet data directories for the planets you want to use as a base
    - eg C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\ 
 2. Modify settings in config.json to suit your needs
