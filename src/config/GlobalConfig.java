@@ -35,9 +35,9 @@ public class GlobalConfig extends CommonConfig {
 		try {
 			encoded = Files.readAllBytes(Paths.get(path));
 			return gson.fromJson(new String(encoded, Charset.defaultCharset()), GlobalConfig.class);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Failed to load config file: " + e.getLocalizedMessage());
 		}
 		return null;
 	}

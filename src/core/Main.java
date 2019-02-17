@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,9 @@ public class Main {
 		String configFile = "config.json";
 		logger.info("Attempting to load " + configFile);
 		config = GlobalConfig.loadConfig(configFile);
+		if(config == null) {
+			return;
+		}
 		GlobalConfig defaultConfig = new GlobalConfig();
 		defaultConfig.setDefaults();
 		config.copyDefaults(defaultConfig);
@@ -73,7 +77,10 @@ public class Main {
 			}
 			logger.info("All Image compression/writer threads complete");
 		}
-		logger.info("Done. exiting...");
+		logger.info("Done. Press the ENTER key to exit");
+		Scanner exit = new Scanner(System.in);
+		exit.nextLine();
+		exit.close();
 	}
 	
 
