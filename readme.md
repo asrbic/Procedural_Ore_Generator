@@ -2,6 +2,9 @@
 
 ## Description
 
+This program will randomly generate ore patches in PlanetDataFiles for existing planets in Space Engineers. The type, size, shape, denity etc of these ores can be configured for each planet. Ore templates can also be created at the global level and overwritten where needed. Optionally, the ids and other settings for each ore can also be populated in the PlanetGeneratorDefinitions.sbc file. 
+
+
 ## How to use
 
 Requires Java version 1.8 or later.
@@ -24,8 +27,10 @@ Requires Java version 1.8 or later.
 4. Copy the contents to a new directory in C:\Users\<username>\AppData\Roaming\SpaceEngineers\Mods\
 5. Add the directory you created to the mod list of a game in Space Engineers and test. You do not need to create a new world.
 6. Select the directory containing your mod in the mod list and click Publish in the bottom right to upload it to the Steam Workshop
+   - The program will print out a formatted table detailing the count of tiles generated for each type of ore (Everything between [table]...[/table]). You can paste this directly into the steam item description.
 
 tl;dr: run.bat
+
 
 ## Configuration Options
 - planetDataPath (default null): Directory of PlanetDataFiles containing data for each planet. If null, no ore generation will occur. 
