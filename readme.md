@@ -23,7 +23,7 @@ Requires Java version 1.8 or later.
      - See https://www.json.org/
 3. Run the program with run.bat
    - You might want to run with "makeColouredMaps": true until you get the output you want. Then run again with "makeColouredMaps": false or manually remove all of the coloured images from each planet directory
-
+   - Writing/compressing pngs can take a surprisingly long time
 4. Copy the contents to a new directory in C:\Users\<username>\AppData\Roaming\SpaceEngineers\Mods\
 5. Add the directory you created to the mod list of a game in Space Engineers and test. You do not need to create a new world.
 6. Select the directory containing your mod in the mod list and click Publish in the bottom right to upload it to the Steam Workshop
