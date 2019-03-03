@@ -10,21 +10,14 @@ import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import config.CommonConfig.PlanetFace;
+
 public class MapHandler implements Runnable {
 	public static final Logger logger = LogManager.getLogger("MapHandler");
 
 public static final String MAT = "_mat.png";
 public static final String ADD = "_add.png";
 public static final String COLOURED = "_coloured.png";
-public static final String FRONT_MAP_NAME = "front";
-public static final String LEFT_MAP_NAME = "left";
-public static final String RIGHT_MAP_NAME = "right";
-public static final String UP_MAP_NAME = "up";
-public static final String DOWN_MAP_NAME = "down";
-public static final String BACK_MAP_NAME = "back";
-
-
-public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_MAP_NAME, UP_MAP_NAME, DOWN_MAP_NAME, BACK_MAP_NAME};
 
 	MapData mapData;
 	String inputPath;
@@ -41,8 +34,8 @@ public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_M
 	}
 	
 	public MapData loadMapData() {
-		for(int i = 0; i < MAP_NAMES.length; ++i) {
-			String mapName = MAP_NAMES[i];
+		for(int i = 0; i < PlanetFace.ALL.length; ++i) {
+			String mapName = PlanetFace.ALL[i].name;
 			try {
 				mapData.images[i] = ImageIO.read(Paths.get(inputPath, mapName + MAT).toFile());
 				if(surfaceHintMaps) {
@@ -70,7 +63,7 @@ public static final String[] MAP_NAMES = {FRONT_MAP_NAME, LEFT_MAP_NAME, RIGHT_M
 				if(mapData.images[i] == null) {
 					continue;
 				}
-				String mapName = MAP_NAMES[i];
+				String mapName = PlanetFace.ALL[i].name;
 				Path path = Paths.get(outputPath);
 				if(Files.notExists(path)) {
 					Files.createDirectories(path);

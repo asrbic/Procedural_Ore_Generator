@@ -65,7 +65,7 @@ public class Generator {
 		// The ugly bit
 		int tilesAdded = 0;
 		int mapSize = mapData.getMapSize();
-		int mapIndex = rand.nextInt(MapData.MAP_SIDES);
+		int mapIndex = ore.planetFaces[rand.nextInt(ore.planetFaces.length)].index;
 		int startColIndex = rand.nextInt(mapSize);
 		int startRowIndex = rand.nextInt(mapSize);
 		Random tileRand = new Random(rand.nextLong());

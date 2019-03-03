@@ -7,24 +7,10 @@ import java.awt.image.BufferedImage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import config.CommonConfig.PlanetFace;
+
 public class MapData {
 	public static final Logger logger = LogManager.getLogger("MapData");
-
-	public static final int FRONT = 0;
-	public static final int LEFT = 1;
-	public static final int RIGHT = 2;
-	public static final int UP = 3;
-	public static final int DOWN = 4;
-	public static final int BACK = 5;
-	
-	public static final int MAP_SIDES = 6;
-	public static final int[][] adjacency = 
-		{{},
-			{},
-			{},
-			{},
-			{},
-			{}};
 	
 	public BufferedImage[] images;
 	public BufferedImage[] surfaceHintImages;
@@ -41,13 +27,14 @@ public class MapData {
 	int mapSize;
 	
 	public MapData() {
-		images = new BufferedImage[MAP_SIDES];
-		surfaceHintImages = new BufferedImage[MAP_SIDES];
-		colouredMaps = new BufferedImage[MAP_SIDES];
+		int mapSides = PlanetFace.ALL.length;
+		images = new BufferedImage[mapSides];
+		surfaceHintImages = new BufferedImage[mapSides];
+		colouredMaps = new BufferedImage[mapSides];
 	}
 	
 	public void clearOreData() {
-		for(int i = 0; i < MAP_SIDES; ++i) {
+		for(int i = 0; i < images.length; ++i) {
 			BufferedImage img = images[i];
 			if(img != null) {
 				for(int j = 0; j < img.getWidth(); ++j) {
@@ -110,7 +97,7 @@ public class MapData {
 	public void countTiles() {
 		logger.info("\tCounting existing ore tiles...");
 		long total = 0;
-		int mapCount = 1;
+		int mapCount = 0;
 		for(BufferedImage img : images) {
 			if(img != null) {
 				long tileCount = 0;
@@ -121,7 +108,8 @@ public class MapData {
 						}
 					}
 				}
-				logger.info("\t\tMap " + mapCount++ + " existing tile count:" + tileCount);
+				logger.info("\t\t" + PlanetFace.ALL[mapCount].name + " map existing tile count:" + tileCount);
+				mapCount++;
 				total += tileCount;
 			}
 		}

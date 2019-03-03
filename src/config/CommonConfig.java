@@ -1,7 +1,27 @@
 package config;
 
 public abstract class CommonConfig {
+
 	
+	public enum PlanetFace {
+		FRONT(0, "front"), 
+		LEFT(1, "left"), 
+		RIGHT(2, "right"), 
+		UP(3, "up"), 
+		DOWN(4, "down"), 
+		BACK(5, "back");
+		
+		public static final PlanetFace[] ALL = {PlanetFace.FRONT, PlanetFace.LEFT, PlanetFace.RIGHT, PlanetFace.UP, PlanetFace.DOWN, PlanetFace.BACK};
+
+		public int index;
+		public String name;
+		PlanetFace(int index, String name) {
+			this.index = index;
+			this.name = name;
+			
+		}
+	}
+
 	public float surfaceAreaMultiplier = -1;
 	public float surfaceAreaVariance = -1;
 	public int maxOreTiles = -1;
@@ -22,6 +42,7 @@ public abstract class CommonConfig {
 	public String mappingFileTargetColour = null;
 	public int mappingFileColourInfluence = -1;
 	public int centreOreTile = -1;
+	public PlanetFace[] planetFaces = null;
 	
 	public void cascadeSettings(CommonConfig other) {
 		if(surfaceAreaMultiplier == -1) {
@@ -84,6 +105,9 @@ public abstract class CommonConfig {
 		if(centreOreTile == -1) {
 			centreOreTile = other.centreOreTile;
 		}
+		if(planetFaces == null) {
+			planetFaces = other.planetFaces;
+		}
 	}
 	
 	public void setDefaults() {
@@ -107,5 +131,6 @@ public abstract class CommonConfig {
 		mappingFileTargetColour = "#616c83";
 		mappingFileColourInfluence = 15;
 		centreOreTile = -1;
+		planetFaces = PlanetFace.ALL;
 	}
 }
