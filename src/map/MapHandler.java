@@ -46,7 +46,7 @@ public static final String COLOURED = "_coloured.png";
 				}
 			}
 			catch(Exception e) {
-				logger.error("Exception occurred:", e);
+				logger.error("Exception occurred while loading map data (images):", e);
 				JOptionPane.showMessageDialog(null, "Unable to load image files from directory:\n" + inputPath, "File Read Error", JOptionPane.ERROR_MESSAGE);
 				return null;
 			}
@@ -79,7 +79,7 @@ public static final String COLOURED = "_coloured.png";
 			}
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			logger.error("Exception occurred while writing map data (images): ", e);
 			JOptionPane.showMessageDialog(null, "Unable to create image files in directory:\n" + outputPath, "File Write Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
