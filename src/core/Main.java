@@ -31,7 +31,16 @@ public class Main {
 	Thread[] imageWriterThreads = null;
 	
 	public static void main(String[] args) {
-		new Main().run();
+		try {
+			new Main().run();
+		}
+		catch(Exception e) {
+			logger.error("Exception occurred: ", e);
+		}
+		logger.info("Done. Press the ENTER key to exit");
+		Scanner exit = new Scanner(System.in);
+		exit.nextLine();
+		exit.close();
 	}
 	
 	public Main() {
@@ -59,7 +68,9 @@ public class Main {
 		}
 		if(config.planetDataPath != null) {
 			imageWriterThreads = new Thread[config.planets.length];
-			generate();
+			if(!generate()) {
+				return;
+			}
 			logger.info("Steam workshop table summary:\n" + getSteamWorkshopSummary());
 		}
 		if(imageWriterThreads != null) {
@@ -77,15 +88,11 @@ public class Main {
 			}
 			logger.info("All Image compression/writer threads complete");
 		}
-		logger.info("Done. Press the ENTER key to exit");
-		Scanner exit = new Scanner(System.in);
-		exit.nextLine();
-		exit.close();
 	}
 	
 
 	
-	public void generate() {
+	public boolean generate() {
 		int threadId = 0;
 		for(PlanetConfig planetConfig : config.planets) {
 			MapData mapData = new MapData();
@@ -93,7 +100,10 @@ public class Main {
 					Paths.get(config.planetDataOutputPath, planetConfig.name).toString(), planetConfig.surfaceHintMaps, planetConfig.makeColouredMaps);
 			logger.info("Processing planet \"" + planetConfig.name + "\"");
 			logger.info("\tLoading map data from: " + Paths.get(config.planetDataPath, planetConfig.name).toString());
-			handler.loadMapData();
+			if(handler.loadMapData() == null) {
+				return false;
+			}
+			
 			if(config.countExistingTiles) {
 				mapData.countTiles();
 			}
@@ -107,6 +117,7 @@ public class Main {
 			imageWriterThreads[threadId].start();
 			++threadId;
 		}
+		return true;
 	}
 	
 	public String getSteamWorkshopSummary() {
