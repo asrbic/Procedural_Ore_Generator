@@ -75,7 +75,7 @@ public class Main {
 			imageWriterFuture.getValue().get();
 			logger.info("Images for " + imageWriterFuture.getKey() + " done");
 		}
-
+		executor.shutdown();
 		logger.info("All Image compression/writer threads complete");
 	}
 	
