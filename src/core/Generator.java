@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.random.JDKRandomGenerator;
@@ -27,8 +28,8 @@ public class Generator {
 	public static final Logger logger = LogManager.getLogger("Generator");
 	public static final int RANDOM_SHAPE = 1;
 	public static final int[] SHAPES = {2,3,4,5,6};
-	Map<String, Map<String, Long>> tileCountMap = new HashMap<String, Map<String, Long>>();
-	
+	Map<String, Map<String, Long>> tileCountMap = new ConcurrentHashMap<>();
+
 	public long generatePatches(MapData mapData, PlanetConfig planetConfig) {
 		Map<String, Long> planetTileCountMap = new HashMap<String, Long>();
 		List<Pair<OreConfig, Double>> tempPairedList = new ArrayList<Pair<OreConfig, Double>>();

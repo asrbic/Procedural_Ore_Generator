@@ -5,9 +5,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.StringWriter;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +27,10 @@ public class Main {
 	MapData mapData;
 	Generator generator;
 	XMLConfigUpdater xmlUpdater;
-	Thread[] imageWriterThreads = null;
-	
+	ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	Set<Future<Boolean>> generatefutures = new HashSet<>();
+	Map<String, Future> imagefutures = new ConcurrentHashMap<>();
+
 	public static void main(String[] args) {
 		try {
 			new Main().run();
@@ -37,19 +38,16 @@ public class Main {
 		catch(Exception e) {
 			logger.error("Exception occurred: ", e);
 		}
-		logger.info("Done. Press the ENTER key to exit");
-		Scanner exit = new Scanner(System.in);
-		exit.nextLine();
-		exit.close();
+		logger.info("Done.");
 	}
 	
 	public Main() {
 		mapData = new MapData();
-		generator = new Generator();
+		generator =  new Generator();
 		xmlUpdater = new XMLConfigUpdater();
 	}
 	
-	public void run() {
+	public void run() throws ExecutionException, InterruptedException {
 		String configFile = "config.json";
 		logger.info("Attempting to load " + configFile);
 		config = GlobalConfig.loadConfig(configFile);
@@ -67,55 +65,50 @@ public class Main {
 			deleteColouredTestFiles();
 		}
 		if(config.planetDataPath != null) {
-			imageWriterThreads = new Thread[config.planets.length];
 			if(!generate()) {
 				return;
 			}
 			logger.info("Steam workshop table summary:\n" + getSteamWorkshopSummary());
 		}
-		if(imageWriterThreads != null) {
 			logger.info("Waiting for all image compression/writer threads to finish...");
-			int i = 0;
-			for(Thread t : imageWriterThreads) {
-				try{
-					t.join();
-					logger.info("Images for " + config.planets[i].name + " done");
-				}
-				catch(InterruptedException e) {
-					logger.error(e);
-				}
-				++i;
-			}
-			logger.info("All Image compression/writer threads complete");
+		for (Map.Entry<String, Future> imageWriterFuture : imagefutures.entrySet()) {
+			imageWriterFuture.getValue().get();
+			logger.info("Images for " + imageWriterFuture.getKey() + " done");
 		}
+
+		logger.info("All Image compression/writer threads complete");
 	}
 	
 
 	
-	public boolean generate() {
-		int threadId = 0;
-		for(PlanetConfig planetConfig : config.planets) {
-			MapData mapData = new MapData();
-			MapHandler handler = new MapHandler(mapData, Paths.get(config.planetDataPath, planetConfig.name).toString(), 
-					Paths.get(config.planetDataOutputPath, planetConfig.name).toString(), planetConfig.surfaceHintMaps, planetConfig.makeColouredMaps);
-			logger.info("Processing planet \"" + planetConfig.name + "\"");
-			logger.info("\tLoading map data from: " + Paths.get(config.planetDataPath, planetConfig.name).toString());
-			if(handler.loadMapData() == null) {
-				return false;
-			}
-			
-			if(config.countExistingTiles) {
-				mapData.countTiles();
-			}
-			logger.info("\tClearing existing ore data");
-			mapData.clearOreData();
-			logger.info("\tGenerating ore tiles with effective ore configs:\n" + toJSON(planetConfig.ores));
-			long tilesGenerated = generator.generatePatches(mapData, planetConfig);
-			logger.info("\tTiles generated:" + tilesGenerated);
-			logger.info("\tWriting ore data to map images in: " + Paths.get(config.planetDataOutputPath, planetConfig.name).toString());
-			imageWriterThreads[threadId] = new Thread(handler);
-			imageWriterThreads[threadId].start();
-			++threadId;
+	public boolean generate() throws ExecutionException, InterruptedException {
+		for(final PlanetConfig planetConfig : config.planets) {
+			generatefutures.add(executor.submit(() -> {
+				MapData mapData = new MapData();
+				MapHandler handler = new MapHandler(mapData, Paths.get(config.planetDataPath, planetConfig.name).toString(),
+						Paths.get(config.planetDataOutputPath, planetConfig.name).toString(), planetConfig.surfaceHintMaps, planetConfig.makeColouredMaps);
+				logger.info(planetConfig.name + ": Processing planet \"" + planetConfig.name + "\"");
+				logger.info(planetConfig.name + ":\tLoading map data from: " + Paths.get(config.planetDataPath, planetConfig.name).toString());
+				if(handler.loadMapData() == null) {
+					return false;
+				}
+
+				if(config.countExistingTiles) {
+					mapData.countTiles();
+				}
+				logger.info(planetConfig.name + ":\tClearing existing ore data");
+				mapData.clearOreData();
+				logger.info(planetConfig.name + ":\tGenerating ore tiles with effective ore configs:\n" + toJSON(planetConfig.ores));
+				long tilesGenerated = generator.generatePatches(mapData, planetConfig);
+				logger.info(planetConfig.name + ":\tTiles generated:" + tilesGenerated);
+				logger.info(planetConfig.name + ":\tWriting ore data to map images in: " + Paths.get(config.planetDataOutputPath, planetConfig.name).toString());
+				imagefutures.put( planetConfig.name, executor.submit(handler));
+				return true;
+			}));
+
+		}
+		for (Future<Boolean> generatefuture : generatefutures) {
+			if(false == generatefuture.get()) {return false;}
 		}
 		return true;
 	}
