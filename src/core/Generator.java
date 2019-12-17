@@ -56,7 +56,7 @@ public class Generator {
 		}
 
 		for(OreConfig ore : oreTileCounts.keySet()) {
-			logger.info("\t\tTiles generated for ore " + ore.type + " (id:" + ore.id + ") with testColour " + Integer.toHexString(ore.testColour) + " : " + oreTileCounts.get(ore));
+			logger.info(planetConfig.name + ":\t\tTiles generated for ore " + ore.type + " (id:" + ore.id + ") with testColour " + Integer.toHexString(ore.testColour) + " : " + oreTileCounts.get(ore));
 		}
 		tileCountMap.put(planetConfig.name, planetTileCountMap);
 		return generatedTiles;
