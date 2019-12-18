@@ -38,6 +38,10 @@ public class Main {
 		catch(Exception e) {
 			logger.error("Exception occurred: ", e);
 		}
+		logger.info("Done. Press the ENTER key to exit");
+		Scanner exit = new Scanner(System.in);
+		exit.nextLine();
+		exit.close();
 		logger.info("Done.");
 	}
 	
