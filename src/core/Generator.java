@@ -133,7 +133,7 @@ public class Generator {
 			}
 			if(paintTile) {
 				int pixRGB = img.getRGB(colIndex, rowIndex);
-				if((pixRGB | ORE_FILTER) == oreId || (centreOreTile != -1 && (pixRGB | ORE_FILTER) == centreOreTile)) { 
+				if((pixRGB & ORE_FILTER) == oreId || (centreOreTile != -1 && (pixRGB & ORE_FILTER) == centreOreTile)) { 
 					paintTile = false;
 				}
 				if((avoidIce && ((pixRGB & ICE_FILTER) == ICE_FILTER))) {
@@ -159,6 +159,8 @@ public class Generator {
 			if(centreOreTile != -1 && iterations == 0) {
 				oreId = ore.id;
 			}
+
+
 			// Handle different shapes
 			switch(oreShape) {
 			case 7:
@@ -311,6 +313,7 @@ public class Generator {
 				
 			}
 		} while(tilesAdded < patchSize && ++iterations < maxIterations);
+		
 		return tilesAdded;
 	}
 	
