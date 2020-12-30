@@ -14,7 +14,7 @@ Requires Java version 1.8 or later.
 2. Modify settings in config.json to suit your needs
    - planetDataPath should equal the path from step 1
    - The "name" for each planet config should be exactly the same as its corresponding directory name in the PlanetDataFiles from step 1
-   - planetGeneratorDefinitionsPath should be the location of PlanetGeneratorDefinitions.sbc you want to use as a base
+   - planetGeneratorDefinitionsPath (or planetGeneratorDefinitionsPathArray) should be the location of PlanetGeneratorDefinitions.sbc you want to use as a base
      - This is in the Data directory above the directory from step 1
    - All settings will cascade from oreTemplates -> all ores, global -> each planet then each planet -> its ores. Settings will not be overwritten if already set. This can minimise the amount of config you need to write.
      - eg. `"id": 1, "type": "Iron_02"` in an ore template will set all ores on all planets which have the id 1 to have the default type Iron_02
@@ -34,9 +34,10 @@ tl;dr: run.bat
 
 ## Configuration Options
 - planetDataPath (default null): Directory of PlanetDataFiles containing data for each planet. If null, no ore generation will occur. 
-- planetGeneratorDefinitionsPath (default null): Directory of PlanetGeneratorDefinitions.sbc to insert entries for configured ores. If null, no definitions file will be produced. 
+- planetGeneratorDefinitionsPath (default null): Directory of PlanetGeneratorDefinitions.sbc to insert entries for configured ores. If null, no definitions file will be produced. Superseded by planetGeneratorDefinitionsPathArray but kept for older configs.
+- planetGeneratorDefinitionsPathArray (default empty): Same as planetGeneratorDefinitionsPath but allows you to specify multiple .sbc files. All of the specified files will be searched for any planet config in config.json. 
 - planetDataOutputPath (default "./PlanetDataFiles/"): Output path for planet data. Not used if no planetDataPath is not set. Directory will be created if it doesn't exist.
-- planetGeneratorDefinitionsOutputPath (default "./"): Output path for PlanetGeneratorDefinitions.sbc. Not used if planetGeneratorDefinitionsPath is not set. Directory will be created if it doesn't exist.
+- planetGeneratorDefinitionsOutputPath (default "./"): Output path for specified .sbc file(s). Not used if planetGeneratorDefinitionsPath is not set. Directory will be created if it doesn't exist.
 - makeColouredMaps (default true): Used at the global level to determine if colour coded test maps will be generated
 - surfaceHintMaps (default true): Used at the global level to determine whether hint maps will be generated
 - countExistingTiles (default true): If true, the existing ore tiles on the map will be counted before they get cleared

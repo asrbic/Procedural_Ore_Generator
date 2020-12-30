@@ -152,7 +152,7 @@ public class Generator {
 				if(ore.makeColouredMaps) {
 					colouredImg.setRGB(colIndex, rowIndex, ore.testColour);
 				}
-				if(isSurfaceHint && hintRand.nextFloat() < ore.surfaceHintProbability) {
+				if(isSurfaceHint && hintImg != null && hintRand.nextFloat() < ore.surfaceHintProbability) {
 					hintImg.setRGB(colIndex, rowIndex, ore.surfaceHintColour);
 				}
 			}

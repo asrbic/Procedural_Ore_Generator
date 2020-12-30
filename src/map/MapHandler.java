@@ -1,5 +1,6 @@
 package map;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,13 +20,15 @@ public static final String MAT = "_mat.png";
 public static final String ADD = "_add.png";
 public static final String COLOURED = "_coloured.png";
 
+	String planetName;
 	MapData mapData;
 	String inputPath;
 	String outputPath;
 	boolean surfaceHintMaps;
 	boolean colouredMaps;
 	
-	public MapHandler(MapData mapData, String inputPath, String outputPath, boolean surfaceHintMaps, boolean colouredMaps) {
+	public MapHandler(String planetName, MapData mapData, String inputPath, String outputPath, boolean surfaceHintMaps, boolean colouredMaps) {
+		this.planetName = planetName;
 		this.mapData = mapData;
 		this.inputPath = inputPath;
 		this.outputPath = outputPath;
@@ -39,7 +42,12 @@ public static final String COLOURED = "_coloured.png";
 			try {
 				mapData.images[i] = ImageIO.read(Paths.get(inputPath, mapName + MAT).toFile());
 				if(surfaceHintMaps) {
-					mapData.surfaceHintImages[i] = ImageIO.read(Paths.get(inputPath, mapName + ADD).toFile());
+					Path imagePath = Paths.get(inputPath, mapName + ADD);
+					File f = imagePath.toFile();
+					if(f.exists())
+						mapData.surfaceHintImages[i] = ImageIO.read(f);
+					else
+						mapData.surfaceHintImages[i] = null;
 				}
 				if(colouredMaps) {
 					mapData.colouredMaps[i] = ImageIO.read(Paths.get(inputPath, mapName + MAT).toFile());
@@ -70,8 +78,8 @@ public static final String COLOURED = "_coloured.png";
 				}
 				ImageIO.write(mapData.images[i], "png" , Paths.get(outputPath, mapName + MAT).toFile());
 				if(surfaceHintMaps) {
-					
-					ImageIO.write(mapData.surfaceHintImages[i], "png" , Paths.get(outputPath, mapName + ADD).toFile());
+					if(mapData.surfaceHintImages[i] != null)
+						ImageIO.write(mapData.surfaceHintImages[i], "png" , Paths.get(outputPath, mapName + ADD).toFile());
 				}
 				if(colouredMaps) {
 					ImageIO.write(mapData.colouredMaps[i], "png" , Paths.get(outputPath, mapName + COLOURED).toFile());
@@ -83,6 +91,7 @@ public static final String COLOURED = "_coloured.png";
 			JOptionPane.showMessageDialog(null, "Unable to create image files in directory:\n" + outputPath, "File Write Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		logger.info("Images for " + planetName + " done.");
 	}
 
 	@Override

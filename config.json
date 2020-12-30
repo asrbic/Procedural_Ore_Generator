@@ -1,6 +1,6 @@
 {
-	"planetDataPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles",
-	"planetGeneratorDefinitionsPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetGeneratorDefinitions.sbc",
+	"planetDataPath": "G:\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles",
+	"planetGeneratorDefinitionsPathArray": ["G:\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetGeneratorDefinitions.sbc", "G:\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\Triton.sbc", "G:\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\Pertam.sbc"],
 	"makeColouredMaps": true,
 	"surfaceHintMaps": true,
 	"shape": 1,
@@ -11,6 +11,15 @@
 			"type": "Iron_02",
 			"surfaceArea": 200,
 			"startDepth": 12,
+			"depth": 6,
+			"testColourHex": "E00000",
+			"centreOreTile": 2
+		},
+		{
+			"id": 2,
+			"type": "Iron_02",
+			"surfaceArea": 200,
+			"startDepth": 2,
 			"depth": 6,
 			"testColourHex": "E00000"
 		},
@@ -327,6 +336,88 @@
 				{
 					"id": 192,
 					"p": 0.3
+				}
+			]
+		},
+				{
+			"name": "Triton",
+			"seed": 1,
+			"surfaceHintColour": 144,
+			"ores": [
+				{
+					"id": 1,
+					"p": 0.4
+				},
+				{
+					"id": 24,
+					"p": 0.2
+				},
+				{
+					"id": 48,
+					"p": 0.2
+				},
+				{
+					"id": 72,
+					"p": 0.4
+				},
+				{
+					"id": 96,
+					"p": 0.02
+				},
+				{
+					"id": 120,
+					"p": 0.15
+				},
+				{
+					"id": 168
+				},
+				{
+					"id": 144,
+					"p": 0.008
+				},
+				{
+					"id": 192
+				}
+			]
+		},
+		{
+			"name": "Pertam",
+			"seed": 1,
+			"surfaceHintColour": 144,
+			"ores": [
+				{
+					"id": 1,
+					"p": 0.4
+				},
+				{
+					"id": 24,
+					"p": 0.2
+				},
+				{
+					"id": 48,
+					"p": 0.2
+				},
+				{
+					"id": 72,
+					"p": 0.4
+				},
+				{
+					"id": 96,
+					"p": 0.02
+				},
+				{
+					"id": 120,
+					"p": 0.15
+				},
+				{
+					"id": 168
+				},
+				{
+					"id": 144,
+					"p": 0.008
+				},
+				{
+					"id": 192
 				}
 			]
 		}

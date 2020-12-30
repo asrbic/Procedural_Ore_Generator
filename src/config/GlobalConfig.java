@@ -26,6 +26,8 @@ public class GlobalConfig extends CommonConfig {
 	public String planetGeneratorDefinitionsOutputPath = null;
 	public Boolean countExistingTiles = null;
 	public String planetGeneratorDefinitionsPath = null;
+	public List<String> planetGeneratorDefinitionsPathArray = new ArrayList<String>();
+	public Boolean concurrentImageWrite;
 	public OreConfig[] oreTemplates;
 	public PlanetConfig[] planets;
 	
@@ -90,6 +92,7 @@ public class GlobalConfig extends CommonConfig {
 		planetDataOutputPath = "./PlanetDataFiles/";
 		countExistingTiles = true;
 		planetGeneratorDefinitionsOutputPath = "./";
+		concurrentImageWrite = true;
 	}
 	
 	public void copyDefaults(GlobalConfig other) {
