@@ -32,18 +32,22 @@ public class Main {
 	Set<Future<Boolean>> generatefutures = new HashSet<>();
 	Map<String, Future> imagefutures = new ConcurrentHashMap<>();
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		try {
 			new Main().run();
 		}
 		catch(Exception e) {
-			logger.error("Exception occurred: ", e);
+			logger.error("Failed, exception occurred: ", e);
+			throw e;
 		}
-		logger.info("Done. Press the ENTER key to exit");
-		Scanner exit = new Scanner(System.in);
-		exit.nextLine();
-		exit.close();
-		logger.info("Done.");
+		finally
+		{
+			logger.info("Done. Press the ENTER key to exit");
+			Scanner exit = new Scanner(System.in);
+			exit.nextLine();
+			exit.close();
+			logger.info("Done.");
+		}
 	}
 	
 	public Main() {
@@ -82,6 +86,7 @@ public class Main {
 			imageWriterFuture.getValue().get();
 		}
 		executor.shutdown();
+		singleThreadExecutor.shutdown();
 		logger.info("All Image compression/writer threads complete");
 	}
 	
@@ -109,9 +114,9 @@ public class Main {
 				logger.info(planetConfig.name + ":\tTiles generated:" + tilesGenerated);
 				logger.info(planetConfig.name + ":\tWriting ore data to map images in: " + Paths.get(config.planetDataOutputPath, planetConfig.name).toString());
 				if(config.concurrentImageWrite)
-					imagefutures.put( planetConfig.name, executor.submit(handler));
+					imagefutures.put(planetConfig.name, executor.submit(handler));
 				else
-					imagefutures.put( planetConfig.name, singleThreadExecutor.submit(handler));
+					imagefutures.put(planetConfig.name, singleThreadExecutor.submit(handler));
 				return true;
 			}));
 

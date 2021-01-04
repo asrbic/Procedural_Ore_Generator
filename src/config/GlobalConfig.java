@@ -27,7 +27,7 @@ public class GlobalConfig extends CommonConfig {
 	public Boolean countExistingTiles = null;
 	public String planetGeneratorDefinitionsPath = null;
 	public List<String> planetGeneratorDefinitionsPathArray = new ArrayList<String>();
-	public Boolean concurrentImageWrite;
+	public Boolean concurrentImageWrite = true;
 	public OreConfig[] oreTemplates;
 	public PlanetConfig[] planets;
 	
