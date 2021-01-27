@@ -42,9 +42,9 @@ public class XMLConfigUpdater {
 				String fileName = f.getName();
 				if (!f.exists()) {
 					JOptionPane.showMessageDialog(null,
-							"Unable to find file: " + config.planetGeneratorDefinitionsPath, "Cannot find planet generator definitions file",
+							"Unable to find file: " + path, "Cannot find planet generator definitions file",
 							JOptionPane.ERROR_MESSAGE);
-					logger.error("Unable to find file: " + config.planetGeneratorDefinitionsPath);
+					logger.error("Unable to find file: " + path);
 					return false;
 				}
 				Builder parser = new Builder(false);
