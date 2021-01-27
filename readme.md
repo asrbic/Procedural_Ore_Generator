@@ -24,9 +24,12 @@ Requires Java version 1.8 or later.
 3. Run the program with run.bat
    - You might want to run with `"makeColouredMaps": true` until you get the output you want. Then run again with `"makeColouredMaps": false` or manually remove all of the coloured images from each planet directory
    - Writing/compressing pngs can take a surprisingly long time
-4. Copy the contents to a new directory in `C:\Users\<username>\AppData\Roaming\SpaceEngineers\Mods\`
-5. Add the directory you created to the mod list of a game in Space Engineers and test. You do not need to create a new world.
-6. Select the directory containing your mod in the mod list and click Publish in the bottom right to upload it to the Steam Workshop
+4. Copy the contents of the `PlanetDataFiles` directory from step 1. to a new directory in the Space Engineers mod directory (`C:\Users\<username>\AppData\Roaming\SpaceEngineers\Mods\`)
+   - Space Engineers will not load a mod if it touches a planet but does not contain the heightmaps (`front.png` etc), even if they are present elsewhere. 
+5. Copy the outputs of the generator tool, `PlanetDataFiles` and `PlanetGeneratorDefinition.sbc`, to the Space Engineers mod direcory from the step above, overwriting any files.
+   - There may be multiple `.sbc` files output. All should be copied.
+6. Add the directory you created to the mod list of a game in Space Engineers and test. You do not need to create a new world.
+7. Select the directory containing your mod in the mod list and click Publish in the bottom right to upload it to the Steam Workshop
    - The program will print out a formatted table detailing the count of tiles generated for each type of ore (Everything between [table]...[/table]). You can paste this directly into the steam item description.
 
 tl;dr: run.bat
