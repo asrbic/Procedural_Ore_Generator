@@ -54,7 +54,7 @@ tl;dr: run.bat
 - startDepth (default 10): Starting depth. Ore will fill from this down "depth" metres.
 - depth (default 6): Vertical size of the ore patch.
 - shape (default 1): Determines the generator which will be used. See the Generator Shapes section for information on each one.
-- patchSizeVariance (default 0.4): Add random variance to the surfaceArea.
+- surfaceAreaVariance (default 0.4): Add random variance to the surfaceArea.
 - avoidIce (default true): If true, this ore will not spawn on/under ice lakes.
 - centreOreTile (default -1): If set to a positive number, the given id will be used as the centre tile of the ore patch. This can be used to generate a single hint tile of ore close to the surface while the rest of the patch is far below, out of ore detector range. Just add the ore you want to be at the centre to the planet's config with "p": 0.0 so it doesn't spawn elsewhere.
 - seed (default 7): Random seed used at the planet level. With the exact same configuration (including seed), the exact same ore patches should be generated. 
