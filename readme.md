@@ -7,7 +7,7 @@ This program will randomly generate ore patches in PlanetDataFiles for existing 
 
 ## How to use
 
-Requires Java version 1.8 or later.
+Requires 64-bit Java version 1.8 or later.
 
 1. Locate the PlanetDataFiles directory containing the planet data directories for the planets you want to use as a base
    - eg `C:\\Program Files (x86)\\Steam\\steamapps\\common\\SpaceEngineers\\Content\\Data\\PlanetDataFiles\\` 
